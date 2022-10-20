@@ -1,0 +1,5 @@
+presentation/node_modules
+presentation/yarn.lock
+presentation/package.json
+presentation/scripts
+presentation/slides.md
