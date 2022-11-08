@@ -1,0 +1,262 @@
+\documentclass[runningheads]{llncs}
+\usepackage{listings}
+\lstset{
+  inputencoding=utf8,
+  extendedchars=true,
+  basicstyle=\footnotesize\ttfamily,
+  mathescape=true,
+  escapeinside={(*}{*)},
+}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\newcommand{\snip}[1]{\footnotesize{\ttfamily{#1}}}
+
+\begin{document}
+\title{Elaboration on Overloaded Functions}
+\author{Marius Weidner}
+\institute{Chair of Programming Languages, University of Freiburg}
+\maketitle
+
+\begin{abstract}
+Most popular programming lanuages support function overloading. Prominent use cases include operator overloading or showing a arbitrary value as a string. We study a minimal extension of the Hindley Milner system that supports function overloading while preserving full type inference~\cite{system-o}. We also derive an alternative system with support for recursive implementations, straight forward debruijn indices and give big step semantics.
+\end{abstract}
+
+\section{Introduction}
+When we talk about shared or overloaded functions we usually mean overloaded identifiers. If we invoke overloaded identifiers as functions we expect the language to choose the correct implementation of multiple given implementations for us based on the type of the arguments.
+
+\subsection{Example}
+\begin{figure}
+  \begin{lstlisting}
+data Bool
+  true  : Bool
+  false : Bool
+data Nat
+  zero : Nat
+  suc  : Nat -> Nat
+data List a
+  nil  : List a
+  cons : a -> List a -> List a
+
+decl eq
+
+impl eq :: Nat -> Nat -> Bool
+  eq zero    zero    = true
+  eq (suc x) (suc y) = eq x y
+  eq _       _       = false
+impl eq :: (eq :: a -> a -> Bool) => List a -> List a -> Bool
+  eq nil         nil         = true
+  eq (cons x xs) (cons y ys) = eq x y && eq xs ys
+  eq _           _           = false
+  \end{lstlisting}
+  \caption{Overloading Example in Preudocode} \label{example}
+\end{figure}
+\noindent In Fig.~\ref{example} we give an example in pseudocode with only three top level language constructs. Using \snip{data} definitions we can define inductive data types. A \snip{delc} statement defines an overloaded identifier. With similar syntax to let statements, \snip{impl} statements provide a concrete implementation for calls to the overloaded identifier for some explicit type. 
+
+The code example first defines 3 well known data types \snip{Bool}, \snip{Nat} and Lists of type \snip{a} (\snip{[a]}). Type variables are implicitly quantified. Next we declare that \snip{eq} should be an overloaded identifier. We follow with two implementations for \snip{eq}. From the explicit type annotation we can deduce that the first implementation takes two \snip{Nat} and performs pattern matching to determine if the are equal. The second implementation is for lists of any type that has an implementation for \snip{eq} itself. The constraint \snip{(eq \ :: \ a -> a -> Bool) => ..} expresses that we need to have an implementation at hand for the type that is substituted for the type variable \snip{a} when using the second implementation of \snip{eq}. Inside the second implementation we can safely call \snip{eq} on elements of the list (because of the constraint) and on sublists (given the language supports recursive implementations). The call \snip{eq [zero] [zero]} would type check while \snip{eq [true] [true]} would fail to type check because the constraint for \snip{eq} of lists requires an implementation of \snip{eq} for \snip{Bool -> Bool -> Bool}.
+\subsection{Examples of Overloading in Popular Languages}
+\paragraph{Python} uses magic methods to support overloading of operators and standard library functions. A class can override the behaviour of any of the predefined magic methods. Commonly used magic methods are for example \snip{\_\_init\_\_(self)} to provide logic when an object of the class is initialized and \snip{\_\_eq\_\_(self, other)}to give custom equality logic for objects of the class when using the \snip{==} operator. In Python it is not possible to define custom magic methods or any other form of custom overloading.
+\paragraph{Haskell} makes use of type classes. Type classes define abstact functions that can be overloaded. A type can be an instance of a type class by concretely defining the behaviour for all functions required by the type class when called on that type. Type variables can have constraints to be an instance of one or more type classes. The type checker then searches for a suitable instance by instance resultion when given a concrete type for the type variable.
+\paragraph{Rust} has a language feature called traits. Similar to Haskells type classes, a trait defines shared functionality in the form of abstract function definitions that can be implemented by types. Type variables can be annotated with a trait bound forcing a concrete type, when substituted for the type variable, to have implemented a specific trait. Similar to Python some traits are predefined to overload operators. In constrast to Haskells type classes, traits can also act as a special kind of types using the \snip{dyn} and \snip{impl} keywords.
+\section{System O}
+System O is a minimal system similar to the Hindley Milner system~\cite{hindley-milner} for overloaded functions by Odersky, Wadler and Wehr~\cite{system-o} with similarities to the pseudo code example above.
+\subsection{Example}
+\subsection{Type Inference Algorithm}
+\subsection{Dictionary Passing Transformation to Hindley Milner}
+\subsection{Record Extension}
+\section{Extending System O}
+We discuss the following three topics not covered by Odersky, Wadler and Wehr in their original paper~\cite{system-o}:
+\begin{itemize}
+  \item Recursive Implementations
+  \item Big Step Semantics
+  \item Debruijn Indices
+\end{itemize}
+\begin{figure}
+  \begin{align*}
+    \text{Constructors} \quad k \ &\in \ \mathcal{K} = \bigcup\{\mathcal{K}_D \ | \ D \in \mathcal{D}\} \\
+    \text{Variables} \quad x \ &\in \ \mathcal{X} \cup \mathcal{K} \\
+    \text{Expressions} \quad e \ &:= \ x \ | \ \lambda x. \ e \ | \ e \ e \ | \ \text{let} \ x = e \ \text{in} \ e \\
+    \text{Programs} \quad p \ &:= \ \text{decl} \ x \ \text{in} \ p \ | \ \text{impl} \ x :  \sigma_T  = e \ \text{in} \ p \\
+    \\
+    \text{Datatype constructors} \quad D \ &\in \ \mathcal{D} \\
+    \text{Type constructors} \quad T \ &\in \ \mathcal{T} = \mathcal{D} \cup \{\rightarrow\} \\ 
+    \text{Type variables} \quad \alpha \ &\in \ \mathcal{A} \\
+    \text{Mono types} \quad \tau \ &:=  \ \alpha \ | \ \tau \rightarrow \tau \ | \ D \ \tau_1 \ .. \ \tau_n \\
+    \text{Poly types} \quad \sigma \ &:=  \ \tau \ | \ \forall \alpha. \ \pi_\alpha \Rightarrow \sigma \\
+    \text{Instance types} \quad \sigma_T \ &:= \ T \ \alpha_1 \ .. \ \alpha_n \rightarrow \tau \ | \ \forall \alpha. \ \pi_\alpha \Rightarrow \sigma_T \\  
+    \text{Constraints} \quad \pi_\alpha \ &:= x_1 : \alpha \rightarrow \tau_1 \ .. \ x_n : \alpha \rightarrow \tau_n \\
+    \\
+    \text{Instance Type Contexts} \quad \Sigma \ &:= \ \cdot \ | \ \Sigma \uplus  \sigma_T \\
+    \text{Type Contexts} \quad \Gamma \ &:= \ \cdot \ | \ \Gamma, \ x : \sigma \ | \ \Gamma, \ x : \Sigma \ | \ \Gamma(x) \uplus \sigma_T \\
+    \\
+    \text{Values} \quad v \ &:=  \lambda (\mathcal{E}; \ x). \ e \ | \ k \ v_1 \ .. \ v_n \ | \ \mathcal{S} \\
+    \text{Instance Eval Contexts} \quad \mathcal{S} \ &:= \ \cdot \ | \ \mathcal{S} \uplus  (e ,\ T) \\
+    \text{Evaluation Contexts} \quad \mathcal{E} \ &:= \ \cdot \ | \ \mathcal{E}, \ x : v  \ | \ \mathcal{E}(x) \uplus (e, \ T)
+  \end{align*}
+  \caption{Syntax}
+\end{figure}
+\begin{figure}$$
+  \begin{array}{c c c c} 
+    \text{(T-Var)}
+    &
+    \displaystyle
+    \frac{x: \sigma  \in \Gamma}
+         {\Gamma \vdash x: \sigma }
+    &
+    \displaystyle
+    \frac{x: \Sigma  \in \Gamma \quad \quad \sigma_T \in \Sigma}
+    {\Gamma \vdash x: \sigma_T }
+    &
+    \text{(T-OVar)}
+    \\\\
+    \text{(T-Abs)}
+    &
+    \displaystyle
+    \frac{\Gamma,\ x:\tau \vdash e : \tau^\prime}
+         {\Gamma \vdash \lambda x. \ e : \tau \rightarrow \tau^\prime}
+    &
+    
+    \displaystyle
+    \frac{\Gamma \vdash e : \tau \rightarrow \tau^\prime \quad\quad \Gamma \vdash e^\prime : \tau}
+         {\Gamma \vdash e \ e^\prime : \tau^\prime}
+    &
+    \text{(T-App)}
+    \\\\
+    \text{(T-Gen)}
+    &
+    \displaystyle
+    \frac{\Gamma, \ \pi_\alpha\vdash e:\sigma \quad \quad \text{fresh }\alpha}
+         {\Gamma \vdash e : \forall \alpha. \pi_\alpha \Rightarrow \ \sigma}
+    &
+    \displaystyle
+    \frac{\Gamma \vdash e: \forall \alpha. \ \pi_\alpha \Rightarrow \sigma \quad \quad \Gamma \vdash [\tau/\alpha]\pi_\alpha}
+         {\Gamma \vdash e:[\tau/\alpha]\sigma}
+    &
+    \text{(T-Inst)}
+    \\\\
+    \text{(T-Set)}
+    &
+    \displaystyle
+    \frac{\Gamma \vdash x_1:\sigma_1  \quad ...\quad \Gamma \vdash x_n:\sigma_n}
+         {\Gamma \vdash x_1:\sigma_1 \quad ...\quad x_n:\sigma_n}
+    &
+    \displaystyle
+    \frac{\Gamma \vdash e^\prime : \sigma \quad \quad \Gamma,\ x:\sigma \vdash e : \tau}
+         {\Gamma \vdash \text{let} \ x = e^\prime \ \text{in} \ e : \tau}
+    &
+    \text{(T-Let)}
+    \\\\
+    \text{(T-Decl)}
+    &
+    \displaystyle
+    \frac{\Gamma, \ x: \cdot  \vdash p : \sigma}
+         {\Gamma \vdash \text{decl} \ x \ \text{in} \ p : \sigma}
+    &
+    \displaystyle
+    \frac{ \begin{matrix}
+        \Gamma \vdash x : \Sigma \quad \quad  \forall \sigma_{T^\prime} \in \Sigma \Rightarrow T \neq T^\prime \\
+        \Gamma(x) \uplus \sigma_T, \ \pi(\sigma_T) \vdash e : \sigma_T \quad \quad  \Gamma(x) \uplus \sigma_T \vdash p: \sigma
+    \end{matrix}}
+    {\Gamma \vdash \text{impl} \ x :  \sigma_T  = e \ \text{in} \ p : \sigma} 
+    &
+    \text{(T-Impl)}
+  \end{array}$$
+  \\\\
+  where $\pi(\forall \alpha_1. \pi_1 .\ \ .. \ \forall \alpha_n. \pi_n. \ \tau) = \pi_1, \ .. , \ \pi_n$
+  \caption{Typing ($\Gamma \vdash p : \sigma$)}
+\end{figure}
+\begin{figure}$$
+  \begin{array}{c c c c} 
+    \text{(R-Var)}
+    &
+    \displaystyle
+    \frac{x: v  \in \mathcal{E}}
+         {\mathcal{E} \vdash x \downarrow v}
+    &
+    \displaystyle
+    \frac{}
+    {\mathcal{E} \vdash \lambda x. \ e \downarrow \lambda (\mathcal{E}; \ x). \ e}
+    &
+    \text{(R-Abs)}
+    \\\\
+    \text{(R-App)}
+    &
+    \displaystyle
+    \frac{ \begin{matrix}
+      \mathcal{E} \vdash e_1 \downarrow \lambda (\mathcal{E^\prime}; \ x). \ e \\
+      \mathcal{E} \vdash e_2 \downarrow v_2 \quad \quad \mathcal{E}^\prime, \ x : v_2 \vdash e \downarrow v
+    \end{matrix}}
+         {\mathcal{E} \vdash e_1 \ e_2 \downarrow v}
+    &
+    \displaystyle
+    \frac{ \begin{matrix}
+      \mathcal{E} \vdash e_1 \downarrow S \quad \quad \mathcal{E} \vdash e_2 \downarrow v_2 \quad\quad \exists(e^\prime, \ T) \in S  \Rightarrow v_2 \sqsubseteq T \\
+      \mathcal{E} \vdash e^\prime \downarrow \lambda (\mathcal{E^\prime}; \ x). \ e  \quad \quad \mathcal{E}^\prime, \ x : v_2 \vdash e \downarrow v
+    \end{matrix}}
+         {\mathcal{E} \vdash e_1 \ e_2 \downarrow v}
+    &
+    \text{(R-IApp)}
+    \\\\
+    \text{(R-Decl)}
+    &
+    \displaystyle
+    \frac{\mathcal{E}, \ x : \cdot \vdash p \downarrow v}
+         {\mathcal{E} \vdash \text{decl} \ x \ \text{in} \ p \downarrow v}
+    &
+    \displaystyle
+    \frac{\mathcal{E}(x) \uplus (e, \ T) \vdash p \downarrow v}
+         {\mathcal{E} \vdash \text{impl} \ x : \sigma_T = \ e \ \text{in} \ p \downarrow v}
+    &
+    \text{(R-Impl)}
+    \\\\
+    \text{(R-CApp)}
+    &
+    \displaystyle
+    \frac{\mathcal{E} \vdash e_1 \downarrow v_1 \ .. \ \mathcal{E} \vdash e_1 \downarrow v_1}
+         {\mathcal{E} \vdash k \ e_1 \ .. \ e_n \downarrow k \ v_1 \ .. \ v_n}
+    &
+    \displaystyle
+    \frac{\mathcal{E} \vdash e^\prime \downarrow v^\prime \quad\quad \mathcal{E},\ x : v^\prime \vdash e \downarrow v}
+         {\mathcal{E} \vdash \text{let} \ x = e^\prime \ \text{in} \ e \downarrow v}
+    &
+    \text{(R-Let)}
+  \end{array}$$
+  \\\\
+  where $v \sqsubseteq T:$
+  $$\begin{array}{c c c c c c} 
+    \text{(C-Abs)}
+    &
+    \displaystyle
+    \frac{}
+         {\lambda (\mathcal{E}; \ x). \ e \sqsubseteq \ \rightarrow}
+    &
+    \text{(C-Cstr)}
+    &
+    \displaystyle
+    \frac{k \in \mathcal{K}_D}
+    {k \ v_1 \ .. \ v_n \sqsubseteq D}
+    &
+    \text{(C-Inst)}
+    &
+    \displaystyle
+    \frac{}
+    {S \sqsubseteq \ \rightarrow}
+  \end{array}$$
+  \caption{Big Step Semantics ($\mathcal{E} \vdash p \downarrow v$)}
+\end{figure}
+\subsection{Soundness}
+Let $\cdot \vdash p : \sigma$ be a valid typing judgment. If $p \downarrow v$ then $\cdot \vdash p : \sigma$.
+\begin{proof} By induction. \\
+
+\end{proof}
+\subsection{Debruijn Indices}
+\subsection{Recursive Implementations}
+\section{Conclusion}
+
+\begin{thebibliography}{8}
+
+\bibitem{system-o}Odersky, M., Wadler, P. \& Wehr, M. A Second Look at Overloading. {\em Proceedings Of The Seventh International Conference On Functional Programming Languages And Computer Architecture}. pp. 135-146 (1995), https://doi.org/10.1145/224164.224195
+\bibitem{hindley-milner}Milner, R. A theory of type polymorphism in programming. {\em Journal Of Computer And System Sciences}. \textbf{17}, 348-375 (1978), https://www.sciencedirect.com/science/article/pii/0022000078900144
+\end{thebibliography}
+\end{document}

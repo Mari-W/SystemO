@@ -1,0 +1,3 @@
+#!/bin/bash
+./node_modules/.bin/marp slides.md --html -o presentation.pdf
+./node_modules/.bin/marp slides.md --html -o index.html

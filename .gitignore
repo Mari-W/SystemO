@@ -1,2 +1,6 @@
-presentation/*
-elaboration/*
+/node_modules
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.lock
