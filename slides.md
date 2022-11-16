@@ -412,7 +412,7 @@ inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool
 ```haskell
 let eq₀ :: Nat -> Nat -> Bool
   = λ.. in
-let eq₁ :: ∀α. (α -> α -> Bool) -> [α] -> [α] -> Bool
+let eq₁ :: ∀α. (α -> α -> Bool) -> [α] -> [α] -> Bool     
   = λeq₀. λ.. in
 ​eq₁ eq₀ [0] [0]            
 ```
@@ -458,13 +458,14 @@ let max :: ∀β. (gte : β -> β -> Bool) =>
 <p class="subtitle">System O —— Relationship with Record Typing</p>
 
 ---
+<style scoped> li {  font-size: 0.7rem;  }</style>
 
-
-#### Repository
+##### Repository
 [github.com/Mari-W/popl](https://github.com/Mari-W/popl)
+#
+#
 
-
-#### Literatur
+##### References
 - [A Second Look at Overloading](https://dl.acm.org/doi/pdf/10.1145/224164.224195) `1995`<br> Martin Odersky, Philip Wadler, Martin Wehr 
 - [A Theory of Type Polymorphism in Programming](https://doi.org/10.1016%2F0022-0000%2878%2990014-4) `1978` <br> Hindley Milner
 
