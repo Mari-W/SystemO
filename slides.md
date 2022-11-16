@@ -189,16 +189,17 @@ $$
 
 
 ```haskell
-let id   = λx. x             in .. :: ∀α. α -> α 
-let cons = λx. λlst. x : lst in .. :: ∀α. α -> [α] -> [α]         
+ let id   = λx. x             in .. :: ∀α. α -> α 
+ let cons = λx. λlst. x : lst in .. :: ∀α. α -> [α] -> [α]         
 ```
 <style scoped> 
   div.error {
     
   }
   div.error > pre {
-   font-size: 0.7rem;
+    font-size: 0.7rem;
     border: 0.06rem;
+    background-color: rgb(242, 241, 244); 
     border-color: #B00020;
     border-style: solid;
     border-radius: 12px;
@@ -207,7 +208,7 @@ let cons = λx. λlst. x : lst in .. :: ∀α. α -> [α] -> [α]
 <div class="error">
 
 ```haskell
-let evil = λi. id. id i      in .. :: Int -> (∀α. α -> α) -> Int
+let evil = λi. id. id i     in .. :: Int -> (∀α. α -> α) -> Int
 ```
 
 </div>
@@ -457,6 +458,7 @@ let max :: ∀β. (gte : β -> β -> Bool) =>
 <p class="subtitle">System O —— Relationship with Record Typing</p>
 
 ---
+
 
 #### Repository
 [github.com/Mari-W/popl](https://github.com/Mari-W/popl)
