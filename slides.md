@@ -44,6 +44,11 @@ style: |
     }
     
 ---
+<!-- 
+Time: 2 min 
+Stage: Introduction (5 min)
+Desc: -
+-->
 
 <!-- _paginate: false -->
 <!-- _footer: Marius Weidner ‒ Chair of Programming Languages ‒ Seminar '22 -->
@@ -51,11 +56,16 @@ style: |
 # A Second Look at Overloading
 
 ---
+<!-- 
+Time: 2 min 
+Stage: Introduction (5 min)
+Desc: Ask who knows Rust / Haskell; explain the one more know about
+-->
 
-<style scoped> pre {  font-size: 0.8rem;  }</style>
+<style scoped> pre {  font-size: 0.6rem;  }</style>
 
-<!-- <div class="columns">
-<div> -->
+<div class="columns">
+<div> 
 
 ```haskell
 class Eq α where
@@ -66,16 +76,20 @@ instance Eq Nat where
   eq (Suc x) (Suc y) = eq x y
   eq _       _       = False
 
+
+
 instance Eq α => Eq [α] where
   eq []       []       = True
   eq (x : xs) (y : ys) = eq x y && 
                          eq xs ys
   eq _        _        = False
 
+
+
 isEq :: Bool
 isEq = eq [Zero] [Zero]
 ```
-<!-- <p class="subtitle">Haskell</p>
+<p class="subtitle">Haskell</p>
 
 </div>
 
@@ -98,7 +112,7 @@ impl<A: Eq> Eq for [A]
       ([], []) => True,
       ([x, xs@..], [y, ys@..]) 
         => x.eq(y) && xs.eq(ys),
-      (_ , _)  => False
+      (_, _)  => False
 
 fn is_eq() -> Bool 
   [Zero].eq(&[Zero])
@@ -106,11 +120,15 @@ fn is_eq() -> Bool
 <p class="subtitle">Rust</p>
 </div>
 
-</div> -->
+</div>
 
 
-<!-- ---
-
+---
+<!-- 
+Time: 1 min 
+Stage: Introduction (5 min)
+Desc: Reduce example before to a simpler pseudo code
+-->
 <style scoped> pre {  font-size: 0.6rem;  }</style>
 
 ```haskell
@@ -130,10 +148,14 @@ fun isEq :: Bool
 
 #
 
-<p class="subtitle">Pseudocode</p> -->
+<p class="subtitle">Pseudocode</p>
 
 ---
-
+<!-- 
+Time: 3 min 
+Stage: Main (20)
+Desc: Explain Hindley Milner syntax, especially let polymorphism & type schemes
+-->
 <div class="columns">
 <div>
 
@@ -163,118 +185,44 @@ $$
 </div>
 </div>
 
-#
-
 <style scoped> pre {  font-size: 0.7rem;  }</style>
 
+
 ```haskell
-let id = λx. x : ∀α. α -> α in foo (id "Answer: ") (id 42)
+let id   = λx. x             in .. :: ∀α. α -> α 
+let cons = λx. λlst. x : lst in .. :: ∀α. α -> [α] -> [α]         
+```
+<style scoped> 
+  div.error {
+    
+  }
+  div.error > pre {
+   font-size: 0.7rem;
+    border: 0.06rem;
+    border-color: #B00020;
+    border-style: solid;
+    border-radius: 12px;
+  }
+</style>
+<div class="error">
+
+```haskell
+let evil = λi. id. id i      in .. :: Int -> (∀α. α -> α) -> Int
 ```
 
-#
+</div>
+
 #
 
 <p class="subtitle">Hindley Milner —— Syntax</p>
 
 ---
-#
 
-$$
-\begin{array}{c c c c} 
-    \text{(TAUT)}
-    &
-    \displaystyle
-    \frac{x: \sigma  \in \Gamma}
-         {\Gamma \vdash x: \sigma }
-    &
-    
-    \displaystyle
-    \frac{\Gamma \vdash e^\prime : \sigma \quad \quad \Gamma,\ x:\sigma \vdash e : \tau}
-         {\Gamma \vdash \textbf{let } x = e^\prime \textbf{ in } e : \tau}
-    &
-    \text{(LET)}
-    \\\\
-    \text{(}\boldsymbol\rightarrow\text{I}\text{)}
-    &
-    \displaystyle
-    \frac{\Gamma,\ x:\tau \vdash e : \tau^\prime}
-         {\Gamma \vdash \lambda x. \ e : \tau \rightarrow \tau^\prime}
-    &
-    
-    \displaystyle
-    \frac{\Gamma \vdash e : \tau \rightarrow \tau^\prime \quad\quad \Gamma \vdash e^\prime : \tau}
-         {\Gamma \vdash e \ e^\prime : \tau^\prime}
-    &
-    \text{(}\boldsymbol\rightarrow\text{E}\text{)}
-    \\\\
-    \text{(}\boldsymbol\forall\text{I}\text{)}
-    &
-    \displaystyle
-    \frac{\Gamma \vdash e:\sigma \quad \quad \text{fresh }\alpha}
-         {\Gamma \vdash e : \forall \alpha. \ \sigma}
-    &
-    \displaystyle
-    \frac{\Gamma \vdash e:\sigma \quad \quad \sigma \sqsubseteq \sigma^\prime}
-         {\Gamma \vdash e:\sigma^\prime}
-    &
-    \text{(}\boldsymbol\forall\text{E}\text{)}
-\end{array}\\
-$$
-
-#
-#
-
-
-<p class="subtitle">Hindley Milner —— Typing</p>
-
----
-
-###### Let $\Gamma = \{\text{id} : \forall \alpha. \ \alpha \rightarrow \alpha, \ \text{n} : \text{Nat} \}$.
-
-#
-#
-
-$$
-\begin{array}{c} 
-     \text{id} : \forall \alpha. \ \alpha \rightarrow \alpha \in \Gamma \quad \quad
-     \forall \alpha. \ \alpha \rightarrow \alpha \sqsubseteq \text{Nat} \rightarrow \text{Nat}
-     \quad\quad \ \
-     \text{n} :\text{Nat} \in \Gamma\\
-
-     \overline{\quad\quad\quad\quad\quad\quad\quad \Gamma \vdash \text{id} : \text{Nat} \rightarrow \text{Nat}\quad\quad\quad\quad\quad\quad\quad} 
-     \quad\quad
-     \overline{\ \Gamma \vdash \text{n} :\text{Nat}  }\\
-
-     \overline{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \Gamma \vdash \text{id} \ \text{n}                    \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad }
-\end{array}\\
-$$
-#
-#
-<p class="subtitle">Hindley Milner —— Instantiation</p>
-
----
-
-$$
-\begin{array}{c}
-    x : \alpha \in \{x : \alpha\} \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \ \\
-    \overline{\ \  x : \alpha \vdash x : \alpha \ \  } \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\ \ \\
-    \quad \quad \quad \overline{\vdash \lambda x. \ x : \alpha \rightarrow \alpha} 
-    \quad \quad \quad \quad
-    \quad \ \
-    \text{id} : \forall \alpha. \ \alpha \rightarrow \alpha \in \{\text{id} : \forall \alpha. \ \alpha  \rightarrow \alpha \} \\
-
-    \overline{\vdash \lambda x. \ x : \forall \alpha. \ \alpha \rightarrow \alpha \quad \text{fresh }\alpha}
-    \quad \quad 
-    \overline{\ \ \text{id} : \forall \alpha. \ \alpha \rightarrow \alpha \vdash \text{id} : \forall \alpha. \ \alpha \rightarrow \alpha \ \ } \\
-
-    \overline{\quad\quad\quad\quad\quad\quad\quad \quad  \vdash \textbf{let } \text{id} = \lambda x. \ x \textbf{ in } \text{id} : \forall \alpha. \ \alpha \rightarrow \alpha \quad\quad\quad\quad\quad\quad\quad \quad }
-\end{array}\\
-$$
-#
-#
-<p class="subtitle">Hindley Milner —— Generalization</p>
-
----
+<!-- 
+Time: 2 min 
+Stage: Main (20)
+Desc: Explain extension with instances + example
+-->
 
 <div class="columns">
 <div>
@@ -314,9 +262,14 @@ inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool =
  eq [0] [0] 
 ```
 
-<p class="subtitle">System O —— Expressions</p>
+<p class="subtitle">System O —— Syntax</p>
 
 ---
+<!-- 
+Time: 5 min 
+Stage: Main (20)
+Desc: Explain extension with constraints + type indexed poly types
+-->
 
 #
 
@@ -333,18 +286,37 @@ $$
 \end{align*}
 $$
 
-<p class="subtitle">System O —— Types</p>
+<p class="subtitle">System O —— Syntax</p>
 
 ---
+<!-- 
+Time: 4 min 
+Stage: Main (20)
+Desc: Explain relevant typing rules (might insert STLC rules beforehand for intuition)
+-->
+
 #
+
 
 
 $$
 \begin{array}{c c} 
+\text{(LET)}
+    &
+    \displaystyle
+    \frac{\Gamma \vdash e_1: \sigma \quad \quad \Gamma, \ x : \sigma \vdash e_2:\tau}
+         {\Gamma \vdash \textbf{let} \ x = e_1 \ \textbf{in} \ e_2 : \tau}
+    \\\\
+    \text{(INST)}
+    &
+    \displaystyle
+    \frac{ \Gamma \vdash e:\sigma_T   \quad \Gamma, \ o : \sigma_T \vdash p : \sigma \quad  \forall (o : \sigma_{T^\prime}) \in \Gamma : T \neq T^\prime}
+         {\Gamma \vdash \textbf{inst} \ o : \sigma_T = e \ \textbf{in} \ p : \sigma} 
+    \\\\
     \text{(}\boldsymbol\forall\text{I)}
     &
     \displaystyle
-    \frac{\Gamma, \ \pi_\alpha\vdash e:\sigma \quad \quad \text{fresh }\alpha}
+    \frac{\Gamma, \ \pi_\alpha\vdash e:\sigma \quad \quad \text{fresh} \ \alpha}
          {\Gamma \vdash e : \forall \alpha. \pi_\alpha \Rightarrow \ \sigma}
     \\\\
     \text{(} \boldsymbol\forall\text{E)}
@@ -352,18 +324,6 @@ $$
     \displaystyle
     \frac{\Gamma \vdash e: \forall \alpha. \ \pi_\alpha \Rightarrow \sigma \quad \quad \Gamma \vdash [\tau/\alpha]\pi_\alpha}
          {\Gamma \vdash e:[\tau/\alpha]\sigma}
-    \\\\
-    \text{(SET)}
-    &
-    \displaystyle
-    \frac{\Gamma \vdash x_1:\sigma_1  \quad ...\quad \Gamma \vdash x_n:\sigma_n}
-         {\Gamma \vdash x_1:\sigma_1 \quad ...\quad x_n:\sigma_n}
-    \\\\
-    \text{(INST)}
-    &
-    \displaystyle
-    \frac{ \Gamma \vdash e:\sigma_T   \quad \Gamma, \ o : \sigma_T \vdash p : \sigma \quad  \forall (o : \sigma_{T^\prime}) \in \Gamma : T \neq T^\prime}
-         {\Gamma \vdash \textbf{inst } o : \sigma_T = e \textbf{ in } p : \sigma} 
     
 \end{array}\\
 $$
@@ -375,8 +335,15 @@ $$
 
 ---
 
+<!-- 
+Time: 3 min 
+Stage: Main (20)
+Desc: Explain example proof derivation + constraint solving, mention nondeterminism + inference algorithm (similar to algorithm w)
+-->
 
-###### Let $\Gamma = \\ \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}, \\ \ \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool}) \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool}$
+
+<style scoped> span {  font-size: 0.8rem;  }</style>
+$\Gamma = \{ \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}, \\ \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool}) \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \}$
 
 
 
@@ -384,19 +351,18 @@ $$
 
 $$
 \begin{array}{c}
-    \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \ \ \\
+    \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool}) \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \quad \\
     
-    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \in \Gamma \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \quad \ \\
+    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \in \Gamma \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \qquad \\
 
-    \overline{\Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})} \quad \ \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool} \in \Gamma \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \quad\quad\quad\quad  \\
+    \overline{\Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})} \quad \ \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool} \in \Gamma   \qquad \qquad \qquad \quad \\
 
-     \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad\overline{\Gamma \vdash \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad\quad\quad\quad \  \  ...\quad\quad\quad\quad\quad\quad\quad\ \\\
+     \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad\overline{\Gamma \vdash \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad ... \\
 
-    \overline{\quad\quad\quad\quad\quad\quad\quad   \Gamma \vdash \text{eq} : [\text{Nat}] \rightarrow [\text{Nat}] \rightarrow \text{Bool}\quad\quad\quad\quad\quad\quad\quad\quad} \quad \overline{\Gamma \vdash [0] : \text{Nat}} \quad\quad \quad \quad \ \ \ ... \quad \quad \quad   \\
+    \overline{\qquad \qquad \qquad \quad  \Gamma \vdash \text{eq} : [\text{Nat}] \rightarrow [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \quad } \quad  ... \\
+    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \qquad \qquad \ \ } \quad ...\\
 
-    \overline{ \ \quad\quad\quad\quad\quad\quad\quad\quad\quad \quad\quad\quad\quad   \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \ \ \ } \quad  \overline{\Gamma \vdash [0] : \text{Nat}}\\
-
-    \overline{\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \ \Gamma \vdash \text{eq} \ [0] \ [0]\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad \ }
+    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \qquad   \Gamma \vdash \text{eq} \ [0] \ [0]  \qquad \qquad \qquad \qquad \qquad \qquad \qquad \ \ }
 \end{array}\\
 $$
 #
@@ -405,18 +371,37 @@ $$
 
 ---
 
+<!-- 
+Time: 3 min 
+Stage: Main (20)
+Desc: Explain example reduction using compositional semantics (very high level, no need to understand the mathematical objects this is translated to)
+-->
 
+$$
+\begin{align*}
+& \ \llbracket \text{inst} \ eq : \mathbb{N} \rightarrow  \mathbb{N} \rightarrow  \mathbb{B} = e_1 \ \text{in} \\ & \ \ \  \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha]\rightarrow  [\alpha] \rightarrow  \mathbb{B} = e_2 \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_\emptyset \\
+=& \ \llbracket \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha] \rightarrow  [\alpha] \rightarrow  \mathbb{B} = .. \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ e_1 \ x \}}\\
+=& \ \llbracket eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ e_2 \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ e_1 \ x \}}\\
+=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ [\alpha] \ \text{then} \ e_2 \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ e_1 \ x) \ [0] \ [0] \\
+=& \ e_2 \ [0] \ [0]
+\end{align*}
+$$
 
-<p class="subtitle">System O —— Compositional Semantics</p>
+<p class="subtitle">System O —— Semantics</p>
 
 ---
 
+<!-- 
+Time: 2 min 
+Stage: Extra (5 min) [skip if no time]
+Desc: Explain example translation from system o to Hindley Milner system
+-->
 
 
 <style scoped> pre {  font-size: 0.7rem;  }</style>
 
 ```haskell
-inst eq : Nat -> Nat -> Bool = λ.. in 
+inst eq : Nat -> Nat -> Bool = λ.. in                 
 inst eq : ∀α. (eq : α -> α -> Bool) 
           => [α] -> [α] -> Bool = λ.. in 
  eq [0] [0] 
@@ -424,9 +409,11 @@ inst eq : ∀α. (eq : α -> α -> Bool)
 <p class="subtitle">System O</p>
 
 ```haskell
-let eq_n→n→b = λ.. in
-let eq_[α]→[α]→b = λeq_n→n→b. λ.. in
- eq_[α]→[α]→b eq_n→n→b [0] [0]            
+let eq₀ :: Nat -> Nat -> Bool
+  = λ.. in
+let eq₁ :: ∀α. (α -> α -> Bool) -> [α] -> [α] -> Bool
+  = λeq₀. λ.. in
+ eq₁ eq₀ [0] [0]            
 ```
 <p class="subtitle">Hindley Milner</p>
 
@@ -435,11 +422,43 @@ let eq_[α]→[α]→b = λeq_n→n→b. λ.. in
 
 <p class="subtitle">System O —— Translation to Hindley Milner</p>
 
+---
 
+<!-- 
+Time: 3 min 
+Stage: Extra (5 min) [skip if no time]
+Desc: Explain example translation from record calculus with subtyping to system o
+-->
+
+
+<style scoped> pre {  font-size: 0.7rem;  }</style>
+
+
+```haskell
+let max :: ∀β. (gte : β -> β -> Bool) => 
+           ∀α. (α <= {key: β}) => α -> α -> α
+  = λx. λy. if gte x.key y.key then x else y in
+ max {field: "a", key: 1} {field: "b", key: 2}
+```
+<p class="subtitle">Records + Subtyping</p>
+
+```haskell
+inst field : ∀α. ∀β. R₀ α β -> α = λR₀ x y. x in
+inst key : ∀α. ∀β. R₀ α β -> β = λR₀ x y. y in
+let max :: ∀β. (gte : β -> β -> Bool) => 
+           ∀α. (key : α -> β) => α -> α -> α
+  = λx. λy. if gte (key x) (key y) then x else y in
+ max (R₀ "a" 1) (R₀ "b" 2)
+```
+<p class="subtitle">System O</p>
+
+# 
+
+<p class="subtitle">System O —— Relationship with Record Typing</p>
 
 ---
 
-#### Slides & Elaboration
+#### Repository
 [github.com/Mari-W/popl](https://github.com/Mari-W/popl)
 
 
