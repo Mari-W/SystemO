@@ -1,1 +1,1 @@
-# A Second Look at Overloading [[Slides]](https://mari-w.github.io/popl/)
+# A Second Look at Overloading [[Slides]](https://mari-w.github.io/popl/) [[Elaboration]](https://mari-w.github.io/popl/elaboration.pdf)
