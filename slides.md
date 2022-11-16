@@ -144,7 +144,7 @@ inst eq :: (eq :: α -> α -> Bool) => [α] -> [α] -> Bool
 
 let isEq = [Zero] == [Zero]
 ```
-
+#
 #
 
 <p class="subtitle">Pseudocode</p>
@@ -207,7 +207,7 @@ $$
 <div class="error">
 
 ```haskell
-let evil = λi. id. id i     in .. :: Int -> (∀α. α -> α) -> Int
+let evil = λi. λid. id i    in .. :: Int -> (∀α. α -> α) -> Int
 ```
 
 </div>
@@ -386,7 +386,8 @@ $$
 =& \ \llbracket e_2 \rrbracket \ [0] \ [0]
 \end{align*}
 $$
-
+#
+#
 <p class="subtitle">System O —— Semantics</p>
 
 ---
