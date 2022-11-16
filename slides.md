@@ -142,8 +142,7 @@ inst eq :: (eq :: α -> α -> Bool) => [α] -> [α] -> Bool
   eq (x:xs) (y:ys)   = eq x y && eq xs ys
   eq _      _        = False
 
-fun isEq :: Bool
-  isEq = [Zero] == [Zero]
+let isEq = [Zero] == [Zero]
 ```
 
 #
@@ -231,7 +230,7 @@ Desc: Explain extension with instances + example
 $$
 \begin{align*}
 e :=& \ \ x \\&|
-      \ o \quad \tiny{(\text{ if overloaded})} \\&|
+      \ o \quad \tiny{(\text{if overloaded})} \\&|
       \ k \quad \tiny{(k \in \{\text{unit}, \ 42, \ [e_1,..,e_n], \ .. \})}\\&|
       \ \lambda x. \ e  \\&|
       \ e \ e  \\&|
@@ -260,7 +259,7 @@ inst eq : Nat -> Nat -> Bool = λx. λy. x ≐ y in
 inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool = 
      | λ[]. λ[]. True
      | λ[x : xs].λ[y : ys]. eq x y && eq xs ys in
- eq [0] [0] 
+​eq [0] [0] 
 ```
 
 <p class="subtitle">System O —— Syntax</p>
@@ -381,10 +380,10 @@ Desc: Explain example reduction using compositional semantics (very high level, 
 $$
 \begin{align*}
 & \ \llbracket \text{inst} \ eq : \mathbb{N} \rightarrow  \mathbb{N} \rightarrow  \mathbb{B} = e_1 \ \text{in} \\ & \ \ \  \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha]\rightarrow  [\alpha] \rightarrow  \mathbb{B} = e_2 \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_\emptyset \\
-=& \ \llbracket \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha] \rightarrow  [\alpha] \rightarrow  \mathbb{B} = .. \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ e_1 \ x \}}\\
-=& \ \llbracket eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ e_2 \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ e_1 \ x \}}\\
-=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ [\alpha] \ \text{then} \ e_2 \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ e_1 \ x) \ [0] \ [0] \\
-=& \ e_2 \ [0] \ [0]
+=& \ \llbracket \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha] \rightarrow  [\alpha] \rightarrow  \mathbb{B} = .. \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
+=& \ \llbracket eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
+=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ [\alpha] \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x) \ [0] \ [0] \\
+=& \ \llbracket e_2 \rrbracket \ [0] \ [0]
 \end{align*}
 $$
 
@@ -402,10 +401,11 @@ Desc: Explain example translation from system o to Hindley Milner system
 <style scoped> pre {  font-size: 0.7rem;  }</style>
 
 ```haskell
-inst eq : Nat -> Nat -> Bool = λ.. in                 
-inst eq : ∀α. (eq : α -> α -> Bool) 
-          => [α] -> [α] -> Bool = λ.. in 
- eq [0] [0] 
+inst eq : Nat -> Nat -> Bool 
+  = λ.. in                 
+inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool 
+  = λ.. in
+​eq [0] [0] 
 ```
 <p class="subtitle">System O</p>
 
@@ -414,7 +414,7 @@ let eq₀ :: Nat -> Nat -> Bool
   = λ.. in
 let eq₁ :: ∀α. (α -> α -> Bool) -> [α] -> [α] -> Bool
   = λeq₀. λ.. in
- eq₁ eq₀ [0] [0]            
+​eq₁ eq₀ [0] [0]            
 ```
 <p class="subtitle">Hindley Milner</p>
 
@@ -437,9 +437,9 @@ Desc: Explain example translation from record calculus with subtyping to system 
 
 ```haskell
 let max :: ∀β. (gte : β -> β -> Bool) => 
-           ∀α. (α <= {key: β}) => α -> α -> α
+           ∀α. (α <= {key: β}) => α -> α -> α      
   = λx. λy. if gte x.key y.key then x else y in
- max {field: "a", key: 1} {field: "b", key: 2}
+​​max {field: "a", key: 1} {field: "b", key: 2}
 ```
 <p class="subtitle">Records + Subtyping</p>
 
@@ -449,7 +449,7 @@ inst key : ∀α. ∀β. R₀ α β -> β = λR₀ x y. y in
 let max :: ∀β. (gte : β -> β -> Bool) => 
            ∀α. (key : α -> β) => α -> α -> α
   = λx. λy. if gte (key x) (key y) then x else y in
- max (R₀ "a" 1) (R₀ "b" 2)
+​max (R₀ "a" 1) (R₀ "b" 2)
 ```
 <p class="subtitle">System O</p>
 
