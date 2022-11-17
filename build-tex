@@ -1,2 +1,3 @@
 #!/bin/bash
 latexmk -pdf main.tex
+mv main.pdf elaboration.pdf 
