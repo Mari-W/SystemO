@@ -46,88 +46,19 @@ style: |
 ---
 <!-- 
 Time: 2 min 
-Stage: Introduction (5 min)
-Desc: -
+Stage: Introduction (5 min) 
 -->
 
 <!-- _paginate: false -->
 <!-- _footer: Marius Weidner ‒ Chair of Programming Languages ‒ Seminar '22 -->
 
-# A Second Look at Overloading
+# A Second Look at Overloading  
 
 ---
-<!-- 
-Time: 2 min 
-Stage: Introduction (5 min)
-Desc: Ask who knows Rust / Haskell; explain the one more know about
--->
 
-<style scoped> pre {  font-size: 0.6rem;  }</style>
-
-<div class="columns">
-<div> 
-
-```haskell
-class Eq α where
-  eq :: α -> α -> Bool
-
-instance Eq Nat where
-  eq Zero    Zero    = True
-  eq (Suc x) (Suc y) = eq x y
-  eq _       _       = False
-
-
-
-instance Eq α => Eq [α] where
-  eq []       []       = True
-  eq (x : xs) (y : ys) = eq x y && 
-                         eq xs ys
-  eq _        _        = False
-
-
-
-isEq :: Bool
-isEq = eq [Zero] [Zero]
-```
-<p class="subtitle">Haskell</p>
-
-</div>
-
-<div>
-
-```rust
-trait Eq
-  fn eq(&self, rhs: &Self) -> Bool
-
-impl Eq for Nat
-  fn eq(&self, rhs: &Self) -> Bool
-    match (self, rhs)
-      (Zero, Zero)     => True,
-      (Suc(x), Suc(y)) => x.eq(y),
-      (_, _)           => False
-
-impl<A: Eq> Eq for [A]
-  fn eq(&self, rhs: &Self) -> Bool 
-    match (self, rhs) 
-      ([], []) => True,
-      ([x, xs@..], [y, ys@..]) 
-        => x.eq(y) && xs.eq(ys),
-      (_, _)  => False
-
-fn is_eq() -> Bool 
-  [Zero].eq(&[Zero])
-```
-<p class="subtitle">Rust</p>
-</div>
-
-</div>
-
-
----
 <!-- 
 Time: 1 min 
 Stage: Introduction (5 min)
-Desc: Reduce example before to a simpler pseudo code
 -->
 <style scoped> pre {  font-size: 0.6rem;  }</style>
 
@@ -147,13 +78,13 @@ let isEq = [Zero] == [Zero]
 #
 #
 
-<p class="subtitle">Pseudocode</p>
+<p class="subtitle">Pseudocode —— Example</p>
 
 ---
+
 <!-- 
 Time: 3 min 
-Stage: Main (20)
-Desc: Explain Hindley Milner syntax, especially let polymorphism & type schemes
+Stage: Main (20 min)
 -->
 <div class="columns">
 <div>
@@ -188,30 +119,31 @@ $$
 
 
 ```haskell
- let id   = λx. x             in .. :: ∀α. α -> α 
- let cons = λx. λlst. x : lst in .. :: ∀α. α -> [α] -> [α]         
+let id :: ∀α. α -> α = λx. x in .. (id 42) .. (id "foo")
+let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..        
 ```
-<style scoped> 
-  div.error {
-    
-  }
-  div.error > pre {
-    font-size: 0.7rem;
-    border: 0.06rem;
-    background-color: rgb(242, 241, 244); 
-    border-color: #B00020;
-    border-style: solid;
-    border-radius: 12px;
-  }
-</style>
-<div class="error">
+
+ <div class="err">
 
 ```haskell
-let evil = λi. λid. id i    in .. :: Int -> (∀α. α -> α) -> Int
+let evil :: Int -> (∀α. α -> α) -> Int = λi. λid. id i in ..     
+(λid. .. (id 42) .. (id "foo") ..) (λx. x)
 ```
 
-</div>
+</div> 
 
+<style scoped>
+  div.err > pre {
+    font-size: 0.7rem; border: 0.05rem; background-color: rgb(242, 241, 244); border-color: #B00020; border-style: solid; border-radius: 12px;
+  }
+  div.err {
+    padding: 0;
+    margin: 0;
+  }
+  div.err > span {
+    margin-left: 0;
+  }
+</style>
 #
 
 <p class="subtitle">Hindley Milner —— Syntax</p>
@@ -220,8 +152,7 @@ let evil = λi. λid. id i    in .. :: Int -> (∀α. α -> α) -> Int
 
 <!-- 
 Time: 2 min 
-Stage: Main (20)
-Desc: Explain extension with instances + example
+Stage: Main (20 min)
 -->
 
 <div class="columns">
@@ -267,8 +198,7 @@ inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool =
 ---
 <!-- 
 Time: 5 min 
-Stage: Main (20)
-Desc: Explain extension with constraints + type indexed poly types
+Stage: Main (20 min)
 -->
 
 #
@@ -290,9 +220,41 @@ $$
 
 ---
 <!-- 
+Time: 2 min 
+Stage: Main (20 min)
+-->
+
+#
+
+$$
+\begin{array}{c c} 
+\text{(VAR)}
+    &
+    \displaystyle
+    \frac{x: \sigma \in \Gamma}
+         {\Gamma \vdash x : \sigma}
+    \\\\
+    \text{(} \boldsymbol\rightarrow\text{I)}
+    &
+    \displaystyle
+    \frac{\Gamma, \ x : \tau^\prime \vdash e : \tau}
+         {\Gamma \vdash \lambda x. \ e : \tau^\prime \rightarrow \tau} 
+    \\\\
+    \text{(} \boldsymbol\rightarrow\text{E)}
+    &
+    \displaystyle
+    \frac{\Gamma \vdash e : \tau^\prime \rightarrow \tau \quad\quad  \Gamma \vdash e^\prime : \tau^\prime  }
+         {\Gamma \vdash e \ e^\prime : \tau}
+    
+\end{array}\\
+$$
+
+
+
+---
+<!-- 
 Time: 4 min 
-Stage: Main (20)
-Desc: Explain relevant typing rules (might insert STLC rules beforehand for intuition)
+Stage: Main (20 min)
 -->
 
 #
@@ -337,8 +299,7 @@ $$
 
 <!-- 
 Time: 3 min 
-Stage: Main (20)
-Desc: Explain example proof derivation + constraint solving, mention nondeterminism + inference algorithm (similar to algorithm w)
+Stage: Main (20 min)
 -->
 
 
@@ -373,8 +334,7 @@ $$
 
 <!-- 
 Time: 3 min 
-Stage: Main (20)
-Desc: Explain example reduction using compositional semantics (very high level, no need to understand the mathematical objects this is translated to)
+Stage: Main (20 min)
 -->
 
 $$
@@ -395,7 +355,6 @@ $$
 <!-- 
 Time: 2 min 
 Stage: Extra (5 min) [skip if no time]
-Desc: Explain example translation from system o to Hindley Milner system
 -->
 
 
@@ -429,7 +388,6 @@ let eq₁ :: ∀α. (α -> α -> Bool) -> [α] -> [α] -> Bool
 <!-- 
 Time: 3 min 
 Stage: Extra (5 min) [skip if no time]
-Desc: Explain example translation from record calculus with subtyping to system o
 -->
 
 
