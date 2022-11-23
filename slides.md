@@ -82,9 +82,9 @@ Stage: Introduction (5 min)
 
 ```haskell
 inst eq : Nat -> Nat -> Bool
-  eq Zero    Zero    = True
-  eq (Suc x) (Suc y) = eq x y
-  eq _       _       = False
+  eq Z     Z     = True
+  eq (S x) (S y) = eq x y
+  eq _     _     = False
 
 inst eq : (eq : α -> α -> Bool) => [α] -> [α] -> Bool
   eq []     []       = True
