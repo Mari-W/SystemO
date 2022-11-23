@@ -52,7 +52,16 @@ Stage: Introduction (5 min)
 <!-- _paginate: false -->
 <!-- _footer: Marius Weidner ‒ Chair of Programming Languages ‒ Seminar '22 -->
 
+<!---
+- Paper "A Second Look at Overloading"
+- Structure: * An Beispiel Problemstellung erarbeiten
+             * Informelle Einführung minimaler Programmiersprache
+             * Formelle Erweiterung dieser um überladene Funktionen
+             * Beziehung zu dieser zu anderen Programmiersprachen
+-->
+
 # A Second Look at Overloading  
+
 
 ---
 
@@ -60,20 +69,29 @@ Stage: Introduction (5 min)
 Time: 1 min 
 Stage: Introduction (5 min)
 -->
+
+<!--
+- Function `eq` mit mehreren Instancen, verschiedenem Verhalten, je nach Typ
+- Implicit typ variablen
+- Constraint erklären
+- In anderen Programmiersprachen: * Type classes in Haskell
+                                  * Traits in Rust
+                                  * Magic methods in Python
+-->
 <style scoped> pre {  font-size: 0.6rem;  }</style>
 
 ```haskell
-inst eq :: Nat -> Nat -> Bool
+inst eq : Nat -> Nat -> Bool
   eq Zero    Zero    = True
   eq (Suc x) (Suc y) = eq x y
   eq _       _       = False
 
-inst eq :: (eq :: α -> α -> Bool) => [α] -> [α] -> Bool
+inst eq : (eq : α -> α -> Bool) => [α] -> [α] -> Bool
   eq []     []       = True
   eq (x:xs) (y:ys)   = eq x y && eq xs ys
   eq _      _        = False
 
-let isEq = [Zero] == [Zero]
+let isEq = eq [Zero] [Zero]
 ```
 #
 #
@@ -86,6 +104,7 @@ let isEq = [Zero] == [Zero]
 Time: 3 min 
 Stage: Main (20 min)
 -->
+
 <div class="columns">
 <div>
 
@@ -93,8 +112,8 @@ $$
 \begin{align*}
 e :=& \ \ x \\&|
       \ \lambda x. \ e  \\&|
-      \ e \ e  \\&|
-      \ \textbf{let } x = e \textbf{ in } e  \\
+      \ e_1 \ e_2  \\&|
+      \ \textbf{let } x = e_2 \textbf{ in } e_1  \\
 
 \end{align*}
 $$
@@ -106,10 +125,9 @@ $$
 $$
 \begin{align*}
 \tau :=& \ \ \alpha \\&|
-          \ \tau \rightarrow \tau  \\
+          \ \tau_1 \rightarrow \tau_2  \\
 \sigma :=& \ \ \tau \\&| 
           \ \forall \alpha. \ \sigma
-
 \end{align*}
 $$
 </div>
@@ -164,8 +182,8 @@ e :=& \ \ x \\&|
       \ o \quad \tiny{(\text{if overloaded})} \\&|
       \ k \quad \tiny{(k \in \{\text{unit}, \ 42, \ [e_1,..,e_n], \ .. \})}\\&|
       \ \lambda x. \ e  \\&|
-      \ e \ e  \\&|
-      \ \textbf{let } x = e \textbf{ in } e  \\
+      \ e_1 \ e_2 \\&|
+      \ \textbf{let} \ x = e_2 \ \textbf{in} \ e_1  \\
 \end{align*}
 $$
 
@@ -175,7 +193,7 @@ $$
 $$
 \begin{align*}
 p :=& \ \ e \\&| 
-       \ \textbf{inst } o : \sigma_T = \sigma \textbf{ in } p \\
+       \ \textbf{inst } o : \sigma_T = e \textbf{ in } p \\
 
 \end{align*}
 $$
@@ -206,13 +224,13 @@ Stage: Main (20 min)
 $$
 \begin{align*}
 \tau :=& \ \ \alpha \\&| 
-          \ \tau \rightarrow \tau\\&|
+          \ \tau_1 \rightarrow \tau_2\\&|
           \ D \ \tau_1 \ ... \ \tau_n \quad \tiny{(D \in \{\text{Unit}, \ \text{Nat}, \ \text{List} \ \tau, ..\}, \ \text{arity}(D) = n)}\\
 \pi_\alpha := & \ \ o_1 : \alpha \rightarrow \tau_1, \ ...  \ \  ,o_n : \alpha \rightarrow \tau_n \quad \tiny{(n \in \mathbb{N}, \ o_i \neq o_j)}\\          
 \sigma :=& \ \ \tau \\&| 
           \ \forall \alpha. \pi_\alpha \Rightarrow \ \sigma_T \\
 \sigma_T :=& \ \ T \ \alpha_1 \ ... \ \alpha_n \rightarrow \tau \quad \tiny{(T \in D \cup \{\rightarrow\}, \ \text{tv}(\tau) \subseteq \{\alpha_1, .., \alpha_n\})} \\&| 
-          \  \forall \alpha. \pi_\alpha \Rightarrow \ \sigma_T \quad \tiny{(\text{tv}(\pi_\alpha) \subseteq \text{tv}(\sigma_T) )}
+          \  \forall \alpha. \pi_\alpha \Rightarrow \sigma_T \quad \tiny{(\text{tv}(\pi_\alpha) \subseteq \text{tv}(\sigma_T) )}
 \end{align*}
 $$
 
@@ -237,18 +255,21 @@ $$
     \text{(} \boldsymbol\rightarrow\text{I)}
     &
     \displaystyle
-    \frac{\Gamma, \ x : \tau^\prime \vdash e : \tau}
-         {\Gamma \vdash \lambda x. \ e : \tau^\prime \rightarrow \tau} 
+    \frac{\Gamma, \ x : \tau_1 \vdash e : \tau_2}
+         {\Gamma \vdash \lambda x. \ e : \tau_1 \rightarrow \tau_2} 
     \\\\
     \text{(} \boldsymbol\rightarrow\text{E)}
     &
     \displaystyle
-    \frac{\Gamma \vdash e : \tau^\prime \rightarrow \tau \quad\quad  \Gamma \vdash e^\prime : \tau^\prime  }
-         {\Gamma \vdash e \ e^\prime : \tau}
+    \frac{\Gamma \vdash e_1 : \tau_1 \rightarrow \tau_2 \quad\quad  \Gamma \vdash e_2 : \tau_1  }
+         {\Gamma \vdash e_1 \ e_2 : \tau_2}
     
 \end{array}\\
 $$
 
+#
+#
+<p class="subtitle">System O —— Typing</p>
 
 
 ---
@@ -266,8 +287,8 @@ $$
 \text{(LET)}
     &
     \displaystyle
-    \frac{\Gamma \vdash e_1: \sigma \quad \quad \Gamma, \ x : \sigma \vdash e_2:\tau}
-         {\Gamma \vdash \textbf{let} \ x = e_1 \ \textbf{in} \ e_2 : \tau}
+    \frac{\Gamma \vdash e_2: \sigma \quad \quad \Gamma, \ x : \sigma \vdash e_1:\tau}
+         {\Gamma \vdash \textbf{let} \ x = e_2 \ \textbf{in} \ e_1 : \tau}
     \\\\
     \text{(INST)}
     &
@@ -279,7 +300,7 @@ $$
     &
     \displaystyle
     \frac{\Gamma, \ \pi_\alpha\vdash e:\sigma \quad \quad \text{fresh} \ \alpha}
-         {\Gamma \vdash e : \forall \alpha. \pi_\alpha \Rightarrow \ \sigma}
+         {\Gamma \vdash e : \forall \alpha. \pi_\alpha \Rightarrow  \sigma}
     \\\\
     \text{(} \boldsymbol\forall\text{E)}
     &
