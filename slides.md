@@ -144,7 +144,7 @@ let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..
  <div class="err">
 
 ```haskell
-let evil :: Int -> (∀α. α -> α) -> Int = λi. λid. id i in ..     
+let evil :: Nat -> (∀α. α -> α) -> Nat = λi. λid. id i in ..     
 (λid. .. (id 42) .. (id "foo") ..) (λx. x)
 ```
 
