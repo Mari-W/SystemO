@@ -228,7 +228,7 @@ $$
           \ D \ \tau_1 \ ... \ \tau_n \quad \tiny{(D \in \{\text{Unit}, \ \text{Nat}, \ \text{List} \ \tau, ..\}, \ \text{arity}(D) = n)}\\
 \pi_\alpha := & \ \ o_1 : \alpha \rightarrow \tau_1, \ ...  \ \  ,o_n : \alpha \rightarrow \tau_n \quad \tiny{(n \in \mathbb{N}, \ o_i \neq o_j)}\\          
 \sigma :=& \ \ \tau \\&| 
-          \ \forall \alpha. \pi_\alpha \Rightarrow \ \sigma_T \\
+          \ \forall \alpha. \pi_\alpha \Rightarrow  \sigma_T \\
 \sigma_T :=& \ \ T \ \alpha_1 \ ... \ \alpha_n \rightarrow \tau \quad \tiny{(T \in D \cup \{\rightarrow\}, \ \text{tv}(\tau) \subseteq \{\alpha_1, .., \alpha_n\})} \\&| 
           \  \forall \alpha. \pi_\alpha \Rightarrow \sigma_T \quad \tiny{(\text{tv}(\pi_\alpha) \subseteq \text{tv}(\sigma_T) )}
 \end{align*}
