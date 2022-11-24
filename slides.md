@@ -144,7 +144,7 @@ let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..
  <div class="err">
 
 ```haskell
-let evil :: Nat -> (∀α. α -> α) -> Nat = λi. λid. id i in ..     
+let  evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..    
 (λid. .. (id 42) .. (id "foo") ..) (λx. x)
 ```
 
@@ -228,7 +228,7 @@ $$
           \ D \ \tau_1 \ ... \ \tau_n \quad \tiny{(D \in \{\text{Unit}, \ \text{Nat}, \ \text{List} \ \tau, ..\}, \ \text{arity}(D) = n)}\\
 \pi_\alpha := & \ \ o_1 : \alpha \rightarrow \tau_1, \ ...  \ \  ,o_n : \alpha \rightarrow \tau_n \quad \tiny{(n \in \mathbb{N}, \ o_i \neq o_j)}\\          
 \sigma :=& \ \ \tau \\&| 
-          \ \forall \alpha. \pi_\alpha \Rightarrow  \sigma_T \\
+          \ \forall \alpha. \pi_\alpha \Rightarrow  \sigma \\
 \sigma_T :=& \ \ T \ \alpha_1 \ ... \ \alpha_n \rightarrow \tau \quad \tiny{(T \in D \cup \{\rightarrow\}, \ \text{tv}(\tau) \subseteq \{\alpha_1, .., \alpha_n\})} \\&| 
           \  \forall \alpha. \pi_\alpha \Rightarrow \sigma_T \quad \tiny{(\text{tv}(\pi_\alpha) \subseteq \text{tv}(\sigma_T) )}
 \end{align*}
@@ -339,9 +339,10 @@ $$
 
     \overline{\Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})} \quad \ \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool} \in \Gamma   \qquad \qquad \qquad \quad \\
 
-     \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad\overline{\Gamma \vdash \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad ... \\
+    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad\overline{\Gamma \vdash \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad ... \\
 
     \overline{\qquad \qquad \qquad \quad  \Gamma \vdash \text{eq} : [\text{Nat}] \rightarrow [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \quad } \quad  ... \\
+
     \overline{\ \ \qquad \qquad \qquad \qquad \qquad \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \qquad \qquad \ \ } \quad ...\\
 
     \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \qquad   \Gamma \vdash \text{eq} \ [0] \ [0]  \qquad \qquad \qquad \qquad \qquad \qquad \qquad \ \ }
