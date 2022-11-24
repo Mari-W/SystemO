@@ -345,7 +345,7 @@ $$
 
     \overline{\ \ \qquad \qquad \qquad \qquad \qquad \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \qquad \qquad \ \ } \quad ...\\
 
-    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \qquad   \Gamma \vdash \text{eq} \ [0] \ [0]  \qquad \qquad \qquad \qquad \qquad \qquad \qquad \ \ }
+    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \ \  \Gamma \vdash \text{eq} \ [0] \ [0] : \text{Bool}  \qquad \qquad \qquad \qquad \qquad \qquad  \ \ }
 \end{array}\\
 $$
 #
