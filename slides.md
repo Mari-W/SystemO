@@ -91,7 +91,7 @@ inst eq : (eq : α -> α -> Bool) => [α] -> [α] -> Bool
   eq (x:xs) (y:ys)   = eq x y && eq xs ys
   eq _      _        = False
 
-let isEq = eq [Zero] [Zero]
+let isEq = eq [Z] [Z]
 ```
 #
 #
@@ -144,7 +144,7 @@ let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..
  <div class="err">
 
 ```haskell
-let  evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..    
+let evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..    
 (λid. .. (id 42) .. (id "foo") ..) (λx. x)
 ```
 
