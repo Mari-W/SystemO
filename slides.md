@@ -137,17 +137,17 @@ $$
 
 
 ```haskell
-let id :: ∀α. α -> α = λx. x in .. (id 42) .. (id "foo")
-let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..        
+let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..         
 ```
 
  <div class="err">
 
 ```haskell
-let evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..    
+let evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..
+```
+```haskell
 (λid. .. (id 42) .. (id "foo") ..) (λx. x)
 ```
-
 </div> 
 
 <style scoped>
@@ -179,11 +179,13 @@ Stage: Main (20 min)
 $$
 \begin{align*}
 e :=& \ \ x \\&|
-      \ o \quad \tiny{(\text{if overloaded})} \\&|
-      \ k \quad \tiny{(k \in \{\text{unit}, \ 42, \ [e_1,..,e_n], \ .. \})}\\&|
       \ \lambda x. \ e  \\&|
-      \ e_1 \ e_2 \\&|
-      \ \textbf{let} \ x = e_2 \ \textbf{in} \ e_1  \\
+      \ e_1 \ e_2  \\&|
+      \ \textbf{let } x = e_2 \textbf{ in } e_1  \\
+
+p :=& \ \ e \\&| 
+       \ \textbf{inst } o : \sigma_T = e \textbf{ in } p \\
+
 \end{align*}
 $$
 
@@ -192,9 +194,11 @@ $$
 
 $$
 \begin{align*}
-p :=& \ \ e \\&| 
-       \ \textbf{inst } o : \sigma_T = e \textbf{ in } p \\
-
+\tau :=& \ \ \alpha \\&| 
+          \ \tau_1 \rightarrow \tau_2\\
+\pi_\alpha := & \ \ o_i : \alpha \rightarrow \tau_i \quad \tiny{i\in\mathbb N} \\     
+\sigma :=& \ \ \tau \\&| 
+          \ \forall \alpha. \pi_\alpha \Rightarrow  \sigma \\
 \end{align*}
 $$
 
@@ -204,43 +208,33 @@ $$
 
 <style scoped> pre {  font-size: 0.7rem;  }</style>
 ```haskell
-inst eq : Nat -> Nat -> Bool = λx. λy. x ≐ y in 
-inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool = 
-     | λ[]. λ[]. True
-     | λ[x : xs].λ[y : ys]. eq x y && eq xs ys in
+inst eq : Nat -> Nat -> Bool = λx. λy. .. in 
+inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool = .. in
 ​eq [0] [0] 
 ```
 
 <p class="subtitle">System O —— Syntax</p>
 
----
-<!-- 
-Time: 5 min 
-Stage: Main (20 min)
--->
+<!-----
 
 #
 
 $$
 \begin{align*}
 \tau :=& \ \ \alpha \\&| 
-          \ \tau_1 \rightarrow \tau_2\\&|
-          \ D \ \tau_1 \ ... \ \tau_n \quad \tiny{(D \in \{\text{Unit}, \ \text{Nat}, \ \text{List} \ \tau, ..\}, \ \text{arity}(D) = n)}\\
+          \ \tau_1 \rightarrow \tau_2\\
 \pi_\alpha := & \ \ o_1 : \alpha \rightarrow \tau_1, \ ...  \ \  ,o_n : \alpha \rightarrow \tau_n \quad \tiny{(n \in \mathbb{N}, \ o_i \neq o_j)}\\          
 \sigma :=& \ \ \tau \\&| 
           \ \forall \alpha. \pi_\alpha \Rightarrow  \sigma \\
-\sigma_T :=& \ \ T \ \alpha_1 \ ... \ \alpha_n \rightarrow \tau \quad \tiny{(T \in D \cup \{\rightarrow\}, \ \text{tv}(\tau) \subseteq \{\alpha_1, .., \alpha_n\})} \\&| 
-          \  \forall \alpha. \pi_\alpha \Rightarrow \sigma_T \quad \tiny{(\text{tv}(\pi_\alpha) \subseteq \text{tv}(\sigma_T) )}
 \end{align*}
 $$
+
+#
+#
 
 <p class="subtitle">System O —— Syntax</p>
 
 ---
-<!-- 
-Time: 2 min 
-Stage: Main (20 min)
--->
 
 #
 
@@ -271,8 +265,8 @@ $$
 #
 <p class="subtitle">System O —— Typing</p>
 
-
----
+-->
+--- 
 <!-- 
 Time: 4 min 
 Stage: Main (20 min)
@@ -280,16 +274,18 @@ Stage: Main (20 min)
 
 #
 
-
-
-$$
-\begin{array}{c c} 
+<!--
 \text{(LET)}
     &
     \displaystyle
     \frac{\Gamma \vdash e_2: \sigma \quad \quad \Gamma, \ x : \sigma \vdash e_1:\tau}
          {\Gamma \vdash \textbf{let} \ x = e_2 \ \textbf{in} \ e_1 : \tau}
     \\\\
+
+-->
+
+$$
+\begin{array}{c c} 
     \text{(INST)}
     &
     \displaystyle
@@ -316,12 +312,11 @@ $$
 
 <p class="subtitle">System O —— Typing</p>
 
+<!--
 ---
 
-<!-- 
 Time: 3 min 
 Stage: Main (20 min)
--->
 
 
 <style scoped> span {  font-size: 0.8rem;  }</style>
@@ -337,21 +332,21 @@ $$
     
     \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \in \Gamma \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \qquad \\
 
-    \overline{\Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})} \quad \ \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool} \in \Gamma   \qquad \qquad \qquad \quad \\
+    \overline{\Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})} \quad \ \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool} \in \Gamma   \qquad \qquad \qquad \quad \\
 
-    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad\overline{\Gamma \vdash \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad ... \\
+    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad \overline{\Gamma \vdash \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad ... \\
 
-    \overline{\qquad \qquad \qquad \quad  \Gamma \vdash \text{eq} : [\text{Nat}] \rightarrow [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \quad } \quad  ... \\
+    \overline{\qquad \qquad \qquad \quad \qquad \quad \Gamma \vdash \text{eq} : [\text{Nat}] \rightarrow [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \quad \qquad \quad } \quad  ... \\
 
-    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \qquad \qquad \ \ } \quad ...\\
+    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \quad \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \qquad \qquad \quad \quad } \quad ...\\
 
-    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \ \  \Gamma \vdash \text{eq} \ [0] \ [0] : \text{Bool}  \qquad \qquad \qquad \qquad \qquad \qquad  \ \ \ }
+    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \quad \  \Gamma \vdash \text{eq} \ [0] \ [0] : \text{Bool}  \qquad \qquad \qquad \qquad \qquad \qquad  \quad \ \ }
 \end{array}\\
 $$
 #
 #
 <p class="subtitle">System O —— Constraint Solving</p>
-
+-->
 ---
 
 <!-- 
