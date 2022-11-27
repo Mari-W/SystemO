@@ -82,7 +82,7 @@ Stage: Introduction (5 min)
 
 ```haskell
 inst eq : Nat -> Nat -> Bool
-  eq Z     Z     = True
+  eq 0     0     = True
   eq (S x) (S y) = eq x y
   eq _     _     = False
 
@@ -91,7 +91,7 @@ inst eq : (eq : α -> α -> Bool) => [α] -> [α] -> Bool
   eq (x:xs) (y:ys)   = eq x y && eq xs ys
   eq _      _        = False
 
-let isEq = eq [Z] [Z]
+let isEq = eq [0] [0]
 ```
 #
 #
@@ -265,13 +265,12 @@ $$
 #
 <p class="subtitle">System O —— Typing</p>
 
--->
 --- 
 <!-- 
 Time: 4 min 
 Stage: Main (20 min)
 -->
-
+---
 #
 
 <!--
@@ -312,41 +311,40 @@ $$
 
 <p class="subtitle">System O —— Typing</p>
 
-<!--
----
 
+---
+<!--
 Time: 3 min 
 Stage: Main (20 min)
-
+-->
 
 <style scoped> span {  font-size: 0.8rem;  }</style>
-$\Gamma = \{ \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}, \\ \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool}) \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \}$
+$\Gamma = \{ \text{eq} : \mathbb{N} \rightarrow \mathbb{N} \rightarrow \mathbb{B}, \\ \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \mathbb{B} \}$
 
 
 
 #
 
 $$
-\begin{array}{c}
-    \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool}) \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \quad \\
+    \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\quad\quad\ \ \ \\
     
-    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \in \Gamma \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \qquad \\
+    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \mathbb{B} \in \Gamma \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \qquad \\
 
-    \overline{\Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \text{Bool})} \quad \ \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool} \in \Gamma   \qquad \qquad \qquad \quad \\
+    \overline{\  \Gamma \vdash \text{eq} : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \ } \qquad \text{eq} : \mathbb{N} \rightarrow \mathbb{N} \rightarrow \mathbb{B} \in \Gamma \qquad\qquad\qquad\qquad\qquad\qquad\quad   \\
 
-    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \text{Bool} \quad \quad \quad \overline{\Gamma \vdash \text{eq} : \text{Nat} \rightarrow \text{Nat} \rightarrow \text{Bool}} \quad ... \\
+    \Rightarrow [\alpha] \rightarrow [\alpha] \rightarrow \mathbb{B} \quad \quad \quad 
+    \overline{\Gamma \vdash \text{eq} : \mathbb{N} \rightarrow \mathbb{N} \rightarrow \mathbb{B}} \qquad \quad \ ... \qquad\quad \\
 
-    \overline{\qquad \qquad \qquad \quad \qquad \quad \Gamma \vdash \text{eq} : [\text{Nat}] \rightarrow [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \quad \qquad \quad } \quad  ... \\
+    \overline{\qquad\qquad\qquad\quad \quad \Gamma \vdash \text{eq} : [\mathbb{N}] \rightarrow [\mathbb{N}] \rightarrow \mathbb{B}\qquad\qquad\qquad\quad\quad } \quad \overline{\Gamma \vdash [0] : [\mathbb{N}]} \qquad\quad \ ... \quad \ \ \ \\\
 
-    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \quad \Gamma \vdash \text{eq}\ [0] : [\text{Nat}] \rightarrow \text{Bool} \qquad \qquad \qquad \qquad \qquad \quad \quad } \quad ...\\
+    \overline{\qquad\qquad\qquad\qquad\qquad\qquad \ \Gamma \vdash \text{eq}\ [0] : [\mathbb{N}] \rightarrow \mathbb{B}\qquad\qquad\qquad\qquad\qquad\qquad} \quad \overline{\Gamma \vdash [0] : [\mathbb{N}]} \\
 
-    \overline{\ \ \qquad \qquad \qquad \qquad \qquad \qquad \quad \  \Gamma \vdash \text{eq} \ [0] \ [0] : \text{Bool}  \qquad \qquad \qquad \qquad \qquad \qquad  \quad \ \ }
-\end{array}\\
+    \overline{\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \Gamma \vdash \text{eq} \ [0] \ [0] : \mathbb{B} \qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad \ }
 $$
 #
 #
 <p class="subtitle">System O —— Constraint Solving</p>
--->
+
 ---
 
 <!-- 
