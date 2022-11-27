@@ -143,10 +143,10 @@ let cons :: ∀α. α -> [α] -> [α] = λx. λlst. x : lst in ..
  <div class="err">
 
 ```haskell
-let evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..
+let evil :: (∀α. α -> α) -> Unit = λid. id 42; id "foo"; in ..    
 ```
 ```haskell
-(λid. .. (id 42) .. (id "foo") ..) (λx. x)
+(λid. .. (id 42) .. (id "foo") ..) (λx. x)                        
 ```
 </div> 
 
