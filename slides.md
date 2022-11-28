@@ -215,73 +215,7 @@ inst eq : ∀α. (eq : α -> α -> Bool) => [α] -> [α] -> Bool = .. in
 
 <p class="subtitle">System O —— Syntax</p>
 
-<!-----
-
-#
-
-$$
-\begin{align*}
-\tau :=& \ \ \alpha \\&| 
-          \ \tau_1 \rightarrow \tau_2\\
-\pi_\alpha := & \ \ o_1 : \alpha \rightarrow \tau_1, \ ...  \ \  ,o_n : \alpha \rightarrow \tau_n \quad \tiny{(n \in \mathbb{N}, \ o_i \neq o_j)}\\          
-\sigma :=& \ \ \tau \\&| 
-          \ \forall \alpha. \pi_\alpha \Rightarrow  \sigma \\
-\end{align*}
-$$
-
-#
-#
-
-<p class="subtitle">System O —— Syntax</p>
-
 ---
-
-#
-
-$$
-\begin{array}{c c} 
-\text{(VAR)}
-    &
-    \displaystyle
-    \frac{x: \sigma \in \Gamma}
-         {\Gamma \vdash x : \sigma}
-    \\\\
-    \text{(} \boldsymbol\rightarrow\text{I)}
-    &
-    \displaystyle
-    \frac{\Gamma, \ x : \tau_1 \vdash e : \tau_2}
-         {\Gamma \vdash \lambda x. \ e : \tau_1 \rightarrow \tau_2} 
-    \\\\
-    \text{(} \boldsymbol\rightarrow\text{E)}
-    &
-    \displaystyle
-    \frac{\Gamma \vdash e_1 : \tau_1 \rightarrow \tau_2 \quad\quad  \Gamma \vdash e_2 : \tau_1  }
-         {\Gamma \vdash e_1 \ e_2 : \tau_2}
-    
-\end{array}\\
-$$
-
-#
-#
-<p class="subtitle">System O —— Typing</p>
-
---- 
-<!-- 
-Time: 4 min 
-Stage: Main (20 min)
--->
----
-#
-
-<!--
-\text{(LET)}
-    &
-    \displaystyle
-    \frac{\Gamma \vdash e_2: \sigma \quad \quad \Gamma, \ x : \sigma \vdash e_1:\tau}
-         {\Gamma \vdash \textbf{let} \ x = e_2 \ \textbf{in} \ e_1 : \tau}
-    \\\\
-
--->
 
 $$
 \begin{array}{c c} 
@@ -357,8 +291,9 @@ $$
 & \ \llbracket \text{inst} \ eq : \mathbb{N} \rightarrow  \mathbb{N} \rightarrow  \mathbb{B} = e_1 \ \text{in} \\ & \ \ \  \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha]\rightarrow  [\alpha] \rightarrow  \mathbb{B} = e_2 \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_\emptyset \\
 =& \ \llbracket \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha] \rightarrow  [\alpha] \rightarrow  \mathbb{B} = .. \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
 =& \ \llbracket eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
-=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ [\alpha] \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x) \ [0] \ [0] \\
-=& \ \llbracket e_2 \rrbracket \ [0] \ [0]
+=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ [\alpha] \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ (\lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x) \ x) \ [0] \ [0] \\
+=& \ \llbracket e_2 \rrbracket \ [0] \ [0] \\
+=& \ \text{true}
 \end{align*}
 $$
 #
