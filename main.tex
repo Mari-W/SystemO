@@ -20,12 +20,16 @@
 \maketitle
 
 \begin{abstract}
-Most popular programming languages support function overloading. Prominent use cases include overloading of arithmetic operators for different types or showing a arbitrary value as a string. We study a minimal extension of the Hindley Milner system that supports function overloading~\cite{system-o}. We also derive an alternative system with support for recursive instances, straight forward debruijn indices and give big step semantics.
+Most popular programming languages support function overloading. Prominent use cases include overloading of arithmetic operators for different types or showing a arbitrary value as a string. We study a minimal extension of the Hindley Milner system~\cite{hindley-milner} that supports function overloading~\cite{system-o}. We also derive an alternative system with support for recursive instances, straight forward debruijn indices and give big step semantics.
 \end{abstract}
 
 \section{Introduction}
-When we talk about shared or overloaded functions we usually mean overloaded identifiers. If we invoke overloaded identifiers as functions we expect the language to choose the correct implementation of multiple given implementations for us based on the type of the arguments.
+When we say "overloaded functions" we usually mean overloaded identifiers. If we invoke overloaded identifiers as functions we expect the type checker to choose the correct instance of multiple given instances for us based on the type of the arguments. In combination with polymorphism we can go one step further by allowing quantified type variables to be restricted on instances. 
 
+\subsection{Examples of Overloading in Popular Languages}
+\paragraph{Python} uses magic methods to support overloading of operators and standard library functions. A class can override the behavior of any of the predefined magic methods. Commonly used magic methods are for example \snip{\_\_init\_\_(self)} to provide logic when an object is initialized and \snip{\_\_eq\_\_(self, other)} to give custom equality logic for objects when using the \snip{==} operator. In Python it is not possible to define custom magic methods or any other form of custom overloading.
+\paragraph{Haskell} makes use of type classes. Type classes define abstract polymorphic functions that can be overloaded for specific types. Therefore we can instantiate a type class for specific types by concretely defining the behavior for all functions required by the type class when the type variables are substituted for those specific types. A function can have type class constraints to force substituted types for type variables to be a member of some instances. 
+\paragraph{Rust} has a language feature called traits. Similar to Haskell's type classes, a trait defines shared functionality in the form of abstract function definitions. Traits are then implemented for one or more types. Type variables can be annotated with a trait bound forcing a concrete type, when substituted for the type variable, to have implemented a specific trait. Similar to Python some traits are predefined to overload operators, but custom traits can be defined. In contrast to Haskell's type classes, traits can also act as a special kind of types using the \snip{dyn} and \snip{impl} keywords.
 \subsection{Example}
 \begin{figure}
   \begin{lstlisting}
@@ -37,19 +41,13 @@ inst eq :: (eq :: a -> a -> Bool) => [a] -> [a] -> Bool
   eq nil         nil         = true
   eq (cons x xs) (cons y ys) = eq x y && eq xs ys
   eq _           _           = false in
-let is_eq = eq [0] [0] in ()
-
+let is_eq = eq [0] [0] in unit
   \end{lstlisting}
   \caption{Overloading Example in Preudocode} \label{example}
 \end{figure}
-\noindent In Fig.~\ref{example} we give a pseudo code example in a function language. Commonly known data types \snip{Nat}, \snip{Bool} and \snip{List} are assumed to be predefined. With syntax similar to \snip{let} statements, \snip{inst} statements provide a concrete implementation for an overloaded identifier with explicit type annotation. The type annotation is used to determine the correct implementation when the overloaded identifier is called. In contrast \snip{let} identifiers cannot be overloaded and all types are inferred. 
-
-We begin with two implementations for \snip{eq}. From the explicit type annotation, we can deduce that the first implementation takes two \snip{Nat} and performs pattern matching to determine if the are equal. 
-The second implementation is for lists of any type that has an implementation for \snip{eq}. More precisely, the constraint \snip{(eq \ :: \ a -> a -> Bool) => ..} expresses that we need to have an implementation at hand for the type that is substituted for the type variable \snip{a} when using the second implementation of \snip{eq}. Inside the second implementation we can safely call \snip{eq} on elements of the list and on sub lists, given the language supports recursive implementations. While \snip{eq [zero] [zero]} would type check, \snip{eq [true] [true]} would fail to type check, because the constraint for \snip{eq} of lists requires an implementation of \snip{eq} for \snip{Bool -> Bool -> Bool}.
-\subsection{Examples of Overloading in Popular Languages}
-\paragraph{Python} uses magic methods to support overloading of operators and standard library functions. A class can override the behavior of any of the predefined magic methods. Commonly used magic methods are for example \snip{\_\_init\_\_(self)} to provide logic when an object is initialized and \snip{\_\_eq\_\_(self, other)}to give custom equality logic for objects when using the \snip{==} operator. In Python it is not possible to define custom magic methods or any other form of custom overloading.
-\paragraph{Haskell} makes use of type classes. Type classes usually have type variables and define abstract functions that can be overloaded. A type can be an instance of a type class by concretely defining the behavior for all functions required by the type class when the type variables of the type class have some explicit type. Type variables can be constrained to be an instance of one or more type classes. The type checker then searches for a suitable instance by instance resolution.
-\paragraph{Rust} has a language feature called traits. Similar to Haskell's type classes, a trait defines shared functionality in the form of abstract function definitions. Traits are then implemented for one or more types, possibly using type variables themselves. Type variables can be annotated with a trait bound forcing a concrete type, when substituted for the type variable, to have implemented a specific trait. Similar to Python some traits are predefined to overload operators. In contrast to Haskell's type classes, traits can also act as a special kind of types using the \snip{dyn} and \snip{impl} keywords.
+\noindent 
+In Fig.~\ref{example} we begin by defining two instances for \snip{eq}.  From the explicit type annotation, we can see that the first instance takes two \snip{Nat} and performs pattern matching to determine if the are equal. 
+The second instance is for lists of any type that has an instance for \snip{eq}. More precisely, the constraint \snip{(eq \ :: \ a -> a -> Bool) => ..} expresses that we need to have an instance at hand for the type that is substituted for the type variable \snip{a} when using the second instance of \snip{eq}. Inside the second instance we can safely call \snip{eq} on elements of the list and on sub lists, given the language supports recursive instances. While \snip{eq [zero] [zero]} would type check, \snip{eq [true] [true]} would fail to type check, because the constraint for \snip{eq} of lists requires an instance of \snip{eq} for \snip{Bool -> Bool -> Bool}.
 \section{System O}
 System O is a minimal extension to the Hindley Milner system~\cite{hindley-milner} by Odersky, Wadler and Wehr~\cite{system-o} and supports overloaded identifiers for functions. To determine the correct instance for a call to an overloaded function System O restricts instances for the same identifier to differ in the type of their first argument. It is therefore straight forward to formulate untyped semantics, since we can determine the type of the first argument uniquely by the value given.
 \subsection{Example}
@@ -57,7 +55,7 @@ System O is a minimal extension to the Hindley Milner system~\cite{hindley-milne
 \subsection{Dictionary Passing Transformation to Hindley Milner}
 \subsection{Record Extension}
 \section{Extending System O}
-We extend System O by recursive instances and give big step semantics. We also design the system to be used with debruijn indices.
+We extend System O by recursive instances and give big step semantics. The system is designed to be easily used with debruijn indices. First we extend syntax and type system, then we give big steps semantics and finally study the use of debruijn indices. 
 \subsection{Syntax}
 \begin{figure}
   \begin{align*}
@@ -81,7 +79,7 @@ We extend System O by recursive instances and give big step semantics. We also d
     \\
     \text{Values} \quad v \ &:=  \lambda (\mathcal{E}; \ x). \ e \ | \ k \ v_1 \ .. \ v_n \ | \ \mathcal{S} \\
     \text{Instance Eval Contexts} \quad \mathcal{S} \ &:= \ \cdot \ | \ \mathcal{S} \uplus  (e ,\ T) \\
-    \text{Evaluation Contexts} \quad \mathcal{E} \ &:= \ \cdot \ | \ \mathcal{E}, \ x : v  \ | \ \mathcal{E}(o) \uplus (e, \ T)
+    \text{Evaluation Contexts} \quad \mathcal{E} \ &:= \ \cdot \ | \ \mathcal{E}, \ x : v  \ | \ \mathcal{E}(o) \uplus (e, \ \sigma_T)
   \end{align*}
   \caption{Syntax}
 \end{figure}
@@ -97,7 +95,7 @@ A value $v$ can be a closure $\lambda (\mathcal{E}; \ x). \ e$, constructor $k$ 
 
 The evaluation context $\mathcal{E}$ is analogous to the typing context $\Gamma$. 
 $\mathcal{E}$ can hold exactly one value for normal identifiers $x$ and multiple typed expressions for overloaded identifiers $o$. 
-We write $\mathcal{E}(o) \uplus (e, T)$ to append a type $(e, T)$ to the list of typed expressions $\mathcal{E}$ of identifier $o$.
+We write $\mathcal{E}(o) \uplus (e, \sigma_T)$ to append a type $(e, \sigma_T)$ to the list of typed expressions $\mathcal{E}$ of identifier $o$.
 \subsection{Typing}
 \begin{figure}$$
   \begin{array}{c c c c} 
@@ -153,20 +151,20 @@ We write $\mathcal{E}(o) \uplus (e, T)$ to append a type $(e, T)$ to the list of
     \text{(T-Decl)}
     &
     \displaystyle
-    \frac{\Gamma, \ o: \cdot  \vdash p : \sigma}
+    \frac{\Gamma, \ o: \cdot  \vdash p : \sigma \quad\quad \text{fresh} \ o}
          {\Gamma \vdash \textbf{decl} \ o \ \textbf{in} \ p : \sigma}
     &
     \displaystyle
     \frac{ \begin{matrix}
         \Gamma \vdash o : \Sigma \quad \quad  \forall \sigma_{T^\prime} \in \Sigma \Rightarrow T \neq T^\prime \\
-        \Gamma(o) \uplus \sigma_T, \ \pi(\sigma_T) \vdash e : \sigma_T \quad \quad  \Gamma(o) \uplus \sigma_T \vdash p: \sigma
+        \Gamma(o) \uplus \sigma_T %, \ \pi(\sigma_T)
+        \vdash e : \sigma_T \quad \quad  \Gamma(o) \uplus \sigma_T \vdash p: \sigma
     \end{matrix}}
     {\Gamma \vdash \textbf{inst} \ o :  \sigma_T  = e \ \textbf{in} \ p : \sigma} 
     &
     \text{(T-Inst)}
   \end{array}$$
-  \\\\
-  where $\pi(\forall \alpha_1. \pi_1 .\ \ .. \ \forall \alpha_n. \pi_n. \ \tau) = \pi_1, \ .. , \ \pi_n$
+  % \\\\ where $\pi(\forall \alpha_1. \pi_1 .\ \ .. \ \forall \alpha_n. \pi_n. \ \tau) = \pi_1, \ .. , \ \pi_n$
   \caption{Typing ($\Gamma \vdash p : \sigma$)}
 \end{figure}
 \noindent Again, we only discuss changes to the original type system. 
@@ -175,7 +173,7 @@ Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it o
 
 Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future \textbf{inst}'s to append their explicit type.
 
-Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. We also can to assume that all constraints $\pi(\sigma_T)$ are met inside $e$. 
+Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. We also can to assume that all constraints $\pi(\sigma_T)$ are met inside $e$. 
 \subsection{Big Step Semantics}
 \begin{figure}$$
   \begin{array}{c c c c} 
@@ -202,7 +200,7 @@ Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the
     &
     \displaystyle
     \frac{ \begin{matrix}
-      \mathcal{E} \vdash e_1 \downarrow S \quad \quad \mathcal{E} \vdash e_2 \downarrow v_2 \quad\quad \exists(e^\prime, \ T) \in S  \Rightarrow v_2 \sqsubseteq T \\
+      \mathcal{E} \vdash e_1 \downarrow S \quad \quad \mathcal{E} \vdash e_2 \downarrow v_2 \quad\quad \exists(e^\prime, \ \sigma_T) \in S  \Rightarrow v_2 \sqsubseteq T \\
       \mathcal{E} \vdash e^\prime \downarrow \lambda (\mathcal{E^\prime}; \ x). \ e  \quad \quad \mathcal{E}^\prime, \ x : v_2 \vdash e \downarrow v
     \end{matrix}}
          {\mathcal{E} \vdash e_1 \ e_2 \downarrow v}
@@ -216,7 +214,7 @@ Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the
          {\mathcal{E} \vdash \textbf{decl} \ o \ \textbf{in} \ p \downarrow v}
     &
     \displaystyle
-    \frac{\mathcal{E}(o) \uplus (e, \ T) \vdash p \downarrow v}
+    \frac{\mathcal{E}(o) \uplus (e, \ \sigma_T) \vdash p \downarrow v}
          {\mathcal{E} \vdash \textbf{inst} \ o : \sigma_T = \ e \ \textbf{in} \ p \downarrow v}
     &
     \text{(R-Inst)}
@@ -258,15 +256,18 @@ Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the
 \end{figure}
 \noindent Rules (R-Var), (R-App), (R-Abs), (R-Let) are standard. 
 
-(R-CApp) evaluates $n$-ary predefined constructors.
+(R-CApp) evaluates $n$-ary predefined constructors, threating $k$ as a function applied to $n$ arguments. 
 
-Analogous to (T-Decl), (R-Decl) 
+Analogous to (T-Decl), (R-Decl) adds the overloaded identifier to the evaluation context with zero instances and evaluates the continuation.
 
-When an overloaded identifier is invoked rule (T-IApp) is used. 
+When an expression $e_1$, that evaluates to a list of type annotated expressions $S$, is applied to some $e_2$, the (R-IApp) rule is invoked. If there exists an instance $(e^\prime, \ \sigma_T) \in S$ which's type $T$ matches the type of the argument $e_2$, we take $e^\prime$ and apply $e_2$ to it. 
 
-The binary relation $v \sqsubseteq T$ relates constructor values to their corresponding type. 
+The binary relation $v \sqsubseteq T$ relates constructor values to their corresponding type and is used inside (R-IApp).
 \subsection{Debruijn Indices}
+In contrast to the original paper our system has the advantage of having only exactly one entry in environments per overloaded identifier. Instead of a new entry for each instance declaration we extend the list of types for each overloaded identifier in $\Gamma$ and list of expressions in $mathcal{E}$ respectively. The reason for introducing the \snip{decl} expression to the language is to have exactly one specific expression to define the new variable, all instance definitions then refer to this one variable.
+
 \section{Conclusion}
+We have studied System O, a minimal system that is foundation of many popular programming languages features like type classes and traits. Because of the close relation to Hindley Milner's system, full type inference is preserved by a simple extension of Algorithm W. System O itself is foundation to many more advanced systems and can be extend by a lot of interesting features. Exemplary, we studied the extension of System O by recursive instance declarations.
 
 \begin{thebibliography}{8}
 

@@ -290,13 +290,13 @@ $$
 \begin{align*}
 & \ \llbracket \text{inst} \ eq : \mathbb{N} \rightarrow  \mathbb{N} \rightarrow  \mathbb{B} = e_1 \ \text{in} \\ & \ \ \  \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha]\rightarrow  [\alpha] \rightarrow  \mathbb{B} = e_2 \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_\emptyset \\
 =& \ \llbracket \text{inst} \ eq : \forall \alpha. \ (\text{eq} : \alpha \rightarrow \alpha \rightarrow \mathbb{B}) \Rightarrow  [\alpha] \rightarrow  [\alpha] \rightarrow  \mathbb{B} = .. \ \text{in} \\ & \ \ \ eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
-=& \ \llbracket eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
-=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ [\alpha] \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ (\lambda x. \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x) \ x) \ [0] \ [0] \\
+=& \ \llbracket eq \ [0] \ [0] \rrbracket_{\{eq := \lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x \}}\\
+=& \ (\lambda x. \ \text{if} \ x \ \text{is} \ \text{List} \ \text{then} \ \llbracket e_2 \rrbracket \ x \ \text{else} \ \text{if} \ x \ \text{is} \ \mathbb{N} \ \text{then} \ \llbracket e_1 \rrbracket \ x) \ [0] \ [0] \\
 =& \ \llbracket e_2 \rrbracket \ [0] \ [0] \\
 =& \ \text{true}
 \end{align*}
 $$
-#
+
 #
 <p class="subtitle">System O —— Semantics</p>
 
