@@ -4,4 +4,5 @@
 *.fls
 *.log
 *.lock
+*.out
 main.pdf
