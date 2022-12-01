@@ -60,7 +60,7 @@ tbd.
 \subsection{Type System}
 System O's type system a simple an extension of Hindley Milner's typing rules~\cite{dm82}. 
 
-The original (GEN) rule is renamed to ($\forall$-I) and extended by passing the constraints $\pi_\alpha$ given by the introduced $\forall \alpha. \ \pi_\alpha \Rightarrow \sigma$ from type scheme to context $\Gamma$. Therefore constraints $\pi_\alpha$ are presumed to be valid inside the expression $e$ that the $\forall$ was introduced to. To eliminate the presumed constraints inside the ($\forall$-E) rule (originally named (INST)), we not only eliminate the $\forall$ by substituting a concrete type for the bound type variable, but also substitute inside the constraints $\pi_\alpha$ and check if they follow form the environment $\Gamma$. 
+The original (GEN) rule is renamed to ($\forall$-I) and extended by passing introduced constraints $\pi_\alpha$ from type scheme to context $\Gamma$. Therefore constraints $\pi_\alpha$ are presumed to be valid inside the expression $e$ that the $\forall$ was introduced to. To eliminate the presumed constraints inside the ($\forall$-E) rule (originally named (INST)), we not only eliminate the $\forall$ by substituting a concrete type for the bound type variable, but also substitute inside the constraints $\pi_\alpha$ and check if they follow form the environment $\Gamma$. 
 
 Since $\pi_\alpha$ has the form of $o_i : \alpha \rightarrow \tau_i$, $i \in \mathbb{N}$ an additional rule (T-Set) is necessary which says that constraints $\pi_\alpha$ are valid if each constraint $o: \alpha \rightarrow \tau$ is valid.
 
@@ -81,7 +81,7 @@ The algorithm uses unification to produce a most general substitution $S^\prime$
      inst eq : $\forall$$\alpha$. (eq : $\alpha$ -> $\alpha$ -> Bool) => [$\alpha$] -> [$\alpha$] -> Bool 
        = $\lambda$.. in
      eq [0] [0]
-     ---------------------- translates to ----------------------
+     --------------------- translates to ---------------------
      let eq$_0$ :: Nat -> Nat -> Bool
        = $\lambda$.. in
      let eq$_1$ :: $\forall$$\alpha$. ($\alpha$ -> $\alpha$ -> Bool) -> [$\alpha$] -> [$\alpha$] -> Bool     
