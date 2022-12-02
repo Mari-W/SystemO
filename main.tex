@@ -22,11 +22,11 @@
 \maketitle
 
 \begin{abstract}
-Most popular programming languages support function overloading. Prominent use cases include overloading of arithmetic operators for different types or showing a arbitrary value as a string. We study a minimal extension of the Hindley Milner system~\cite{hm78} that supports function overloading~\cite{oww95}. We also derive an alternative system with support for recursive instances, straight forward debruijn indices and give big step semantics.
+Real world programming languages need function overloading. Prominent use cases include overloading of arithmetic operators for different types or showing a arbitrary value as a string. We study a minimal extension of the Hindley Milner system~\cite{hm78} that supports function overloading~\cite{oww95}, while preserving full type inference. We also derive an alternative system with support for recursive instances, straight forward debruijn indices and give big step semantics.
 \end{abstract}
 
 \section{Introduction}
-When we say "overloaded functions" we usually mean overloaded identifiers. If we invoke overloaded identifiers as functions we expect the type checker to choose the correct instance of multiple given instances for us based on the type of the arguments. In combination with polymorphism we can go one step further by allowing quantified type variables to be restricted on instances. 
+When we say "overloaded functions" we usually mean overloaded identifiers. An overloaded identifier has one or more \emph{instances}. Each instance works for a \emph{different} type for it's first argument and gives specific logic for when called on that type. If we invoke the overloaded identifiers as function we expect the type checker to choose the correct instance for us based on the type of the first argument. In combination with polymorphism we can go one step further by allowing quantified type variables to be restricted. A type variable can be restricted to be only substitutable by a type for which some instance, with that type as first argument, exists. Most of popular real world programming languages support overloading in a variety of ways, but they can usually be reduced to a more minimal system with only overloaded function identifiers. 
 
 \subsection{Examples of Overloading in Popular Languages}
 \paragraph{Python} uses magic methods to support overloading of operators and standard library functions. A class can override the behavior of any of the predefined magic methods. Commonly used magic methods are for example \snip{\_\_init\_\_(self)} to provide logic when an object is initialized and \snip{\_\_eq\_\_(self, other)} to give custom equality logic for objects when using the \snip{==} operator. In Python it is not possible to define custom magic methods or any other form of custom overloading.
@@ -48,15 +48,16 @@ let is_eq = eq [0] [0] in unit
   \caption{Overloading Example in Preudocode} \label{example}
 \end{figure}
 \noindent 
-In Fig.~\ref{example} we begin by defining two instances for \snip{eq}.  From the explicit type annotation, we can see that the first instance takes two \snip{Nat} and performs pattern matching to determine if the are equal. 
+In Fig.~\ref{example} we begin by defining two instances for \snip{eq}.  From the \emph{explicit type annotation}, we can follow that the first instance takes two \snip{Nat} and performs pattern matching to determine if the are equal. 
 The second instance is for lists of any type that has an instance for \snip{eq}. More precisely, the constraint \snip{(eq \ :: \ a -> a -> Bool) => ..} expresses that we need to have an instance at hand for the type that is substituted for the type variable \snip{a} when using the second instance of \snip{eq}. Inside the second instance we can safely call \snip{eq} on elements of the list and on sub lists, given the language supports recursive instances. While \snip{eq [zero] [zero]} would type check, \snip{eq [true] [true]} would fail to type check, because the constraint for \snip{eq} of lists requires an instance of \snip{eq} for \snip{Bool -> Bool -> Bool}.
 \section{System O}
 System O is a minimal extension to the Hindley Milner system~\cite{hm78} by Odersky, Wadler and Wehr~\cite{oww95} and supports overloaded identifiers for functions.
-\subsection{Example}
-tbd.
-
 \subsection{Syntax}
-tbd.
+Hindley Milner's system~\cite{hm78} is extended by instance declarations and constraints on type variables.
+
+Instance declarations $\textbf{inst} \ o : \sigma_T = e \ \textbf{in} \ p$ declare a new instance for overloaded identifier $o$ inside the rest of the program $p$. The explicit type annotation $\sigma_T$ can be a polymorphic \emph{function} type and index $T$ stores the type of the first argument. Body $e$ must be compatible with $\sigma_T$.
+
+Polymorphic types $\sigma_T$ can introduce type variables $\alpha$ using the $\forall$ quantifier. On top of the original Hindley Milner quantifier $\forall \alpha. \ \sigma$, System O allows to introduce constraints $\pi_\alpha$ on $\alpha$ as a list of $o : \alpha \rightarrow \tau$ where $o$ is some overloaded identifier and $\tau$ is a monomorphic type. We write   $\forall \alpha. \ \pi_\alpha \Rightarrow \sigma = \forall \alpha. \ (o_i : \alpha \rightarrow \tau_i) \Rightarrow \sigma$. Constraints tell the type system that $\alpha$ can only be substituted by a type $\tau^\prime$ when there exists an instance $o : \tau^\prime \rightarrow \tau$.
 \subsection{Type System}
 System O's type system a simple an extension of Hindley Milner's typing rules~\cite{dm82}. 
 
@@ -68,7 +69,7 @@ Finally, there is an additional rule (INST) to type instance declarations. Since
 \subsection{Semantics}
 To determine the correct instance for a call to an overloaded function at runtime, System O restricts instances for the same identifier to differ in the type of their first argument. It is therefore straight forward to formulate \emph{untyped} semantics, since we can determine the type of the first argument uniquely by the value given. The authors give denotational semantics and therefore define a meaning function $\llbracket \cdot \rrbracket_\eta$ that gives a term or type $\cdot$ a mathematical meaning in environment $\eta$. Inside section \ref{semantics} we give operational semantics for a slightly modified System O. 
 \subsection{Type Inference Algorithm}
-The authors extend Hindler Milner's Algorithm W~\cite{hm78}. We only discuss changes to the original Algorithm W.
+The authors extended Hindler Milner's Algorithm W~\cite{hm78}. We only discuss changes to the original Algorithm W.
 
 The algorithm is extended by a case for \snip{inst} declarations. The \emph{infered} type $\sigma_T^\prime$ of the body $e$ must be \emph{less} general than the type annotation $\sigma_T$, e.g. $\mathbb{N} \rightarrow \mathbb{N}$ is less general than $\forall \alpha. \ \pi_\alpha \Rightarrow \alpha \rightarrow \alpha$.
 
@@ -76,17 +77,17 @@ The algorithm uses unification to produce a most general substitution $S^\prime$
 \subsection{Dictionary Passing Transformation to Hindley Milner}
 \begin{figure}
   \begin{lstlisting}
-     inst eq : Nat -> Nat -> Bool 
-       = $\lambda$.. in                 
-     inst eq : $\forall$$\alpha$. (eq : $\alpha$ -> $\alpha$ -> Bool) => [$\alpha$] -> [$\alpha$] -> Bool 
-       = $\lambda$.. in
-     eq [0] [0]
-     --------------------- translates to ---------------------
-     let eq$_0$ :: Nat -> Nat -> Bool
-       = $\lambda$.. in
-     let eq$_1$ :: $\forall$$\alpha$. ($\alpha$ -> $\alpha$ -> Bool) -> [$\alpha$] -> [$\alpha$] -> Bool     
-       = $\lambda$eq$_0$. $\lambda$.. in
-     eq$_1$ eq$_0$ [0] [0]  
+inst eq : Nat -> Nat -> Bool 
+  = $\lambda$.. in                 
+inst eq : $\forall$$\alpha$. (eq : $\alpha$ -> $\alpha$ -> Bool) => [$\alpha$] -> [$\alpha$] -> Bool 
+  = $\lambda$.. in
+eq [0] [0]
+--------------------- translates to ---------------------
+let eq$_0$ :: Nat -> Nat -> Bool
+  = $\lambda$.. in
+let eq$_1$ :: $\forall$$\alpha$. ($\alpha$ -> $\alpha$ -> Bool) -> [$\alpha$] -> [$\alpha$] -> Bool     
+  = $\lambda$eq$_0$. $\lambda$.. in
+eq$_1$ eq$_0$ [0] [0]  
   \end{lstlisting}
   \caption{Dictionary Passing Transform} \label{transform}
 \end{figure}
@@ -98,9 +99,30 @@ Constraints $\pi_\alpha$ can only appear in the explicit type of instances. Cons
 
 An example translation can be found in Fig.~\ref{transform}.
 
-\subsection{Record Extension}
-tbd.
+\subsection{Relationship with Record Typing}
+\begin{figure}
+  \begin{lstlisting}
+let max :: $\forall$$\beta$. (gte : $\beta$ -> $\beta$ -> Bool) 
+            => $\forall$$\alpha$. ($\alpha$ $\leq$ {key: $\beta$}) => $\alpha$ -> $\alpha$ -> $\alpha$      
+  = $\lambda$x. $\lambda$y. if gte x.key y.key then x else y in
+max {field: "a", key: 1} {field: "b", key: 2}
+------------------ translates to ------------------
+inst field : $\forall$$\alpha$. $\forall$$\beta$. R$_0$ $\alpha$ $\beta$ -> $\alpha$ = $\lambda$R$_0$ x y. x in
+inst key : $\forall$$\alpha$. $\forall$$\beta$. R$_0$ $\alpha$ $\beta$ -> $\beta$ = $\lambda$R$_0$ x y. y in
+let max :: $\forall$$\beta$. (gte : $\beta$ -> $\beta$ -> Bool) 
+            => $\forall$$\alpha$. (key : $\alpha$ -> $\beta$) => $\alpha$ -> $\alpha$ -> $\alpha$
+  = $\lambda$x. $\lambda$y. if gte (key x) (key y) then x else y in
+max (R$_0$ "a" 1) (R$_0$ "b" 2)  
+  \end{lstlisting}
+  \caption{Translating Records + Subtyping to System O} \label{translate}
+\end{figure}
+System O can be extended with records and subtyping on records. More surprisingly this extended language can be translated \emph{back} to System O without the record extension.
 
+The record extension introduces record types $\{l_i : \tau_i\}_{i \in \mathbb{N}}$, record expressions $\{l_i = e_i \}_{i \in \mathbb{N}}$, selectors $e.l$ selecting label $l$ on record $e$ and subtyping constraints $a \leq b$ where $a$ must have all fields of $b$ with the same type, but can have even more fields with arbitrary types that $b$ does not have.
+
+% todo
+
+A minimal example can be found in Fig.~\ref{translate}
 \section{Extending System O}
 We extend System O by recursive instances and give big step semantics. The system is designed to straight forwardly use debruijn representation. First we extend syntax and type system, then we give big steps semantics and finally study the use of debruijn indices. 
 \subsection{Syntax}
@@ -220,7 +242,7 @@ Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it o
 
 Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future \textbf{inst}'s to append their explicit type.
 
-Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. We also can to assume that all constraints $\pi(\sigma_T)$ are met inside $e$. 
+Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. % We also can to assume that all constraints $\pi(\sigma_T)$ are met inside $e$. 
 \subsection{Big Step Semantics}
 \label{semantics}
 \begin{figure}$$
