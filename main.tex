@@ -29,8 +29,9 @@ We also derive an alternative system with support for recursive instances, strai
 \end{abstract}
 
 \section{Introduction}
-The term overloading refers to overloaded \emph{identifiers}.
-We overload the meaning of an identifier $o$ with multiple valid interpretations, in the form of functions, called \emph{instances}.
+We use the term overloading to refer to overloaded \emph{identifiers}.
+We overload the meaning of an identifier $o$ with multiple valid interpretations in the form of \emph{functions}. 
+Each interpretation is called an \emph{instance}.
 Each instance gives one specific meaning to the identifier. 
 Each instance is unique in the type of the first argument $T$. 
 We say identifier $o$ is defined on $T$, if there exists an instance where $T$ is the type of the first argument of that function.
@@ -215,9 +216,9 @@ The system is designed to straight forwardly use debruijn representation.
     \text{Instance Eval Contexts} \quad \mathcal{S} \ &:= \ \cdot \ | \ \mathcal{S} \uplus  (e ,\ T) \\
     \text{Evaluation Contexts} \quad \mathcal{E} \ &:= \ \cdot \ | \ \mathcal{E}, \ x : v  \ | \ \mathcal{E}(o) \uplus (e, \ \sigma_T)
   \end{align*}
-  \caption{Syntax}
+  \caption{Syntax} \label{syntax}
 \end{figure}
-\noindent We only discuss changes to the original System O syntax.
+\noindent Syntax is given in Fig.~\ref{syntax}. We only discuss changes to the original System O syntax. 
 
 The $\textbf{decl}$ statement declares an identifier $o$ to be overloaded in $p$. 
 Identifiers can only have instances, if declared as overloaded.
@@ -269,7 +270,7 @@ We write $\mathcal{E}(o) \uplus (e, \sigma_T)$ to append a type $(e, \sigma_T)$ 
     \frac{\Gamma \vdash e: \forall \alpha. \ \pi_\alpha \Rightarrow \sigma \quad \quad \Gamma \vdash [\tau/\alpha]\pi_\alpha}
          {\Gamma \vdash e:[\tau/\alpha]\sigma}
     &
-    \text{(T-Inst)}
+    \text{(T-TInst)}
     \\\\
     \text{(T-Set)}
     &
@@ -292,23 +293,22 @@ We write $\mathcal{E}(o) \uplus (e, \sigma_T)$ to append a type $(e, \sigma_T)$ 
     \displaystyle
     \frac{ \begin{matrix}
         \Gamma \vdash o : \Sigma \quad \quad  \forall \sigma_{T^\prime} \in \Sigma \Rightarrow T \neq T^\prime \\
-        \Gamma(o) \uplus \sigma_T %, \ \pi(\sigma_T)
+        \Gamma(o) \uplus \sigma_T
         \vdash e : \sigma_T \quad \quad  \Gamma(o) \uplus \sigma_T \vdash p: \sigma
     \end{matrix}}
     {\Gamma \vdash \textbf{inst} \ o :  \sigma_T  = e \ \textbf{in} \ p : \sigma} 
     &
     \text{(T-Inst)}
   \end{array}$$
-  % \\\\ where $\pi(\forall \alpha_1. \pi_1 .\ \ .. \ \forall \alpha_n. \pi_n. \ \tau) = \pi_1, \ .. , \ \pi_n$
-  \caption{Typing ($\Gamma \vdash p : \sigma$)}
+  \caption{Typing ($\Gamma \vdash p : \sigma$)} \label{typing}
 \end{figure}
-\noindent Again, we only discuss changes to the original type system. 
+\noindent Typing rules are given in Fig.~\ref{typing}. Again, we only discuss changes to the original type system. 
 
 Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it occurs in the list of function types $\Sigma$ that the variable is overloaded with. 
 
 Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future \textbf{inst}'s to append their explicit type.
 
-Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. % We also can to assume that all constraints $\pi(\sigma_T)$ are met inside $e$. 
+Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. 
 \subsection{Big Step Semantics}
 \label{semantics}
 \begin{figure}$$
@@ -389,20 +389,20 @@ Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the
     \frac{}
     {S \sqsubseteq \ \rightarrow}
   \end{array}$$
-  \caption{Big Step Semantics ($\mathcal{E} \vdash p \downarrow v$)}
+  \caption{Big Step Semantics ($\mathcal{E} \vdash p \downarrow v$)} \label{semantics}
 \end{figure}
-\noindent Rules (R-Var), (R-App), (R-Abs), (R-Let) are standard. 
+\noindent Evaluation rules are given in Fig.~\ref{semantics}. Rules (R-Var), (R-App), (R-Abs), (R-Let) are standard. 
 
 (R-CApp) evaluates $n$-ary predefined constructors, threating $k$ as a function applied to $n$ arguments. 
 
 Analogous to (T-Decl), (R-Decl) adds the overloaded identifier to the evaluation context with zero instances and evaluates the continuation.
 
-When an expression $e_1$, that evaluates to a list of type annotated expressions $S$, is applied to some $e_2$, the (R-IApp) rule is invoked. If there exists an instance $(e^\prime, \ \sigma_T) \in S$ which's type $T$ matches the type of the argument $e_2$, we take $e^\prime$ and apply $e_2$ to it. 
+We use rule (R-IApp) for invocations $e_1 \ e_2$ of overloaded identifiers. Thus $e_1$ evaluates to a list of typed expressions $S$. If there exists an instance $(e^\prime, \ \sigma_T) \in S$ which's type $T$ matches the type of the argument $e_2$, we take $e^\prime$ and apply $v_2$ (evaluated $e_2$) to it. To determine if (R-App) or (R-IApp) should be used for some application $e_1 \ e_2$, we can simply check if $e_1$ evaluates to a list $S$ or a single value $v$. 
 
 The binary relation $v \sqsubseteq T$ relates constructor values to their corresponding type and is used in rule (R-IApp).
 
 \subsection{Debruijn Indices}
-In contrast to the original paper our system has the advantage of having only exactly one entry in environments per overloaded identifier. 
+In contrast to the original paper the extended system has the advantage of only storing exactly one entry per overloaded identifier in environments. 
 Instead of a new entry for each instance declaration we extend the list of types for each overloaded identifier in $\Gamma$ and list of expressions in $\mathcal{E}$ respectively.
 The reason for introducing the \snip{decl} expression to the language is to have exactly one specific expression to define the new variable, all instance definitions then refer to this one variable. 
 With these changes transforming a given program to debruijn representation is straight forward.
