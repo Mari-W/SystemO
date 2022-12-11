@@ -35,7 +35,7 @@ Each interpretation is called an \emph{instance}.
 Each instance gives one specific meaning to the identifier. 
 Each instance is unique in the type of the first argument $T$. 
 We say identifier $o$ is defined on $T$, if there exists an instance where $T$ is the type of the first argument of that function.
-Hence, if a instance is invoked as a function we can decide the instance invoked based on the type of the first value applied to the identifier. 
+Hence, if an identifier is invoked as a function we can decide the instance invoked based on the type of the first value applied to the identifier. 
 In combination with polymorphism we can go one step further by permitting quantified type variables to be restricted. 
 A type variable can be restricted to be only substitutable by a type $T$ for which instances $o_1, \ .., \ o_n$ are defined on $T$.
 Real world programming languages support overloading in a variety of ways, but they can usually be reduced to a more minimal system with only overloaded function identifiers. 
@@ -308,7 +308,8 @@ Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it o
 
 Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future \textbf{inst}'s to append their explicit type.
 
-Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. 
+Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. 
+To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. 
 \subsection{Big Step Semantics}
 \label{semantics}
 \begin{figure}$$
@@ -397,7 +398,10 @@ Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the
 
 Analogous to (T-Decl), (R-Decl) adds the overloaded identifier to the evaluation context with zero instances and evaluates the continuation.
 
-We use rule (R-IApp) for invocations $e_1 \ e_2$ of overloaded identifiers. Thus $e_1$ evaluates to a list of typed expressions $S$. If there exists an instance $(e^\prime, \ \sigma_T) \in S$ which's type $T$ matches the type of the argument $e_2$, we take $e^\prime$ and apply $v_2$ (evaluated $e_2$) to it. To determine if (R-App) or (R-IApp) should be used for some application $e_1 \ e_2$, we can simply check if $e_1$ evaluates to a list $S$ or a single value $v$. 
+We use rule (R-IApp) for invocations $e_1 \ e_2$ of overloaded identifiers.
+Thus $e_1$ evaluates to a list of typed expressions $S$. 
+If there exists an instance $(e^\prime, \ \sigma_T) \in S$ which's type $T$ matches the type of the argument $e_2$, we take $e^\prime$ and apply $v_2$ (evaluated $e_2$) to it.
+To determine if (R-App) or (R-IApp) should be used for some application $e_1 \ e_2$, we can simply check if $e_1$ evaluates to a list $S$ or a single value $v$. 
 
 The binary relation $v \sqsubseteq T$ relates constructor values to their corresponding type and is used in rule (R-IApp).
 
