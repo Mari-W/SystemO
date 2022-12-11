@@ -17,7 +17,7 @@
 
 \begin{document}
 \title{Elaboration on Overloading}
-\author{Marius Weidner}
+\author{Marius Weidner \\ \email{weidner@cs.uni-freiburg.de}}
 \institute{Chair of Programming Languages, University of Freiburg}
 \maketitle
 
@@ -98,7 +98,7 @@ We write $\forall \alpha. \ (o_1 : \alpha \rightarrow \tau_1, o_n : \alpha \righ
 \subsection{Type System}
 System O's type system a simple an extension of Hindley Milner's typing rules~\cite{dm82}. 
 
-The original (GEN) rule is renamed to ($\forall$-I) and extended by passing introduced constraints $\pi_\alpha$ from type scheme to context $\Gamma$. 
+Rule ($\forall$-I) is extended by passing introduced constraints $\pi_\alpha$ from type scheme to context $\Gamma$. 
 Hence constraints $\pi_\alpha$ are presumed to be valid inside the expression $e$ that the $\forall$ was introduced to. 
 
 To eliminate the presumed constraints inside the ($\forall$-E) rule, we not only eliminate the $\forall$ by substituting a concrete type $\tau$ for the bound type variable $\alpha$, but also substitute $\tau$ for $\alpha$ inside constraints $\pi_\alpha$ and check if they follow form the environment $\Gamma$. 
