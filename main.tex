@@ -36,8 +36,8 @@ Each instance gives one specific meaning to the identifier and is unique in the 
 We say identifier $o$ is defined on $T$, if there exists an instance where $T$ is the type of the first argument of that function.
 Hence, if an identifier is invoked as a function we can decide the instance invoked based on the type of the first value applied to the identifier. 
 
-In combination with polymorphism we can go one step further by permitting quantified type variables to be restricted. 
-A type variable can be restricted to be only substitutable by a type $T$ for which instances $o_1, \ .., \ o_n$ are defined on $T$. 
+In combination with polymorphism we can go one step further and permit quantified type variables to be restricted. 
+A type variable can be restricted to be only substitutable with type $T$, for which instances $o_1, \ .., \ o_n$ are defined on $T$. 
 
 \subsection{Example}
   \begin{figure}
@@ -58,7 +58,7 @@ let is_eq = eq [0] [0] in unit
 In Fig.~\ref{example} we define two instances for the overloaded identifier \snip{eq}. 
 Using the \emph{explicit} type annotation, we can reason that the first instance takes two \snip{Nat} and performs pattern matching to determine if the are equal. 
 The second instance is for lists with elements of type \snip{$\alpha$}. 
-However, \snip{$\alpha$} is constrained to only be substituted by types $T$ for which \snip{eq} is defined on $T$.
+However, \snip{$\alpha$} is constrained to only be substituted with types $T$, for which \snip{eq} is defined on $T$.
 Inside the second instance we can safely call \snip{eq} on elements of the list, because of the constraint, and on sub-lists, given the language supports recursive instances. 
 While \snip{eq [0] [0]} type checks, \snip{eq [true] [true]} would fail to type check, because the constraint is not satisfied.
 
@@ -83,7 +83,7 @@ In contrast to Haskell's type classes, traits can also act as a special kind of 
 System O is a minimal extension to the Hindley Milner system~\cite{hm78} by Odersky, Wadler and Wehr~\cite{oww95} and supports overloaded identifiers for functions. 
 Since the Hindley Milner system is widely known, we only discuss the extensions System O adds to the Hindley Milner System. 
 \subsection{Syntax}
-Hindley Milner's syntax is extended by instance declarations and constraints on type variables.
+Hindley Milner's syntax is extended with instance declarations and constraints on type variables.
 
 Instance declarations $\textbf{inst} \ o : \sigma_T = e \ \textbf{in} \ p$ declare a new instance for overloaded identifier $o$ inside the rest of the program $p$. 
 The explicit type annotation $\sigma_T$ must be a, possibly polymorphic, \emph{function} type where $T$ denotes the type of the first argument. 
@@ -96,10 +96,10 @@ We write $\forall \alpha. \ (o_1 : \alpha \rightarrow \tau_1, \ .. \ , o_n : \al
 \subsection{Type System}
 System O's type system a simple an extension of Hindley Milner's typing rules~\cite{dm82}. 
 
-Rule ($\forall$-I) is extended by passing introduced constraints $\pi_\alpha$ from type scheme to context $\Gamma$. 
+Rule ($\forall$-I) passes introduced constraints $\pi_\alpha$ from type scheme to context $\Gamma$. 
 Hence constraints $\pi_\alpha$ are presumed to be valid inside the expression $e$ that the $\forall$ was introduced to. 
 
-To eliminate the presumed constraints inside the ($\forall$-E) rule, we not only eliminate the $\forall$ by substituting a concrete type $\tau$ for the bound type variable $\alpha$, but also substitute $\tau$ for $\alpha$ inside constraints $\pi_\alpha$ and check if they follow form the environment $\Gamma$. 
+To eliminate the presumed constraints inside the ($\forall$-E) rule, we not only eliminate the $\forall$, but also $\pi_\alpha$. We substitute $\tau$ for $\alpha$ inside constraints $\pi_\alpha$ and check if they follow form the environment $\Gamma$. 
 
 Since $\pi_\alpha$ is a list of constraints $o_i : \alpha \rightarrow \tau_i$, $i \in \mathbb{N}$, an additional rule (SET) is necessary. 
 The rule says that constraints $\pi_\alpha$ are valid, if each single constraint $o: \alpha \rightarrow \tau$ is valid.
@@ -308,7 +308,7 @@ We write $\mathcal{E}(o) \uplus (e, \sigma_T)$ to append a type $(e, \sigma_T)$ 
 
 Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it occurs in the list of function types $\Sigma$ that the variable is overloaded with. 
 
-Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future \textbf{inst}'s to append their explicit type.
+Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future instance declarations to append their explicit type.
 
 Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. 
 To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. 
@@ -416,7 +416,7 @@ With these changes transforming a given program to debruijn representation is st
 \section{Conclusion}
 We have studied System O, a minimal system that is foundation of many popular programming languages features like Haskell's type classes and Rust's traits. 
 Because of the close relation to Hindley Milner's system, full type inference is preserved by a simple extension of Algorithm W. 
-We extended System O by recursive instance declarations and gave operational semantics.
+We extended System O with recursive instance declarations and gave operational semantics.
 
 \newpage 
 
