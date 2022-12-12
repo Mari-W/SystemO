@@ -190,10 +190,10 @@ The translation introduces data types $R_i \ \alpha_1 \ .. \ \alpha_n$ for each 
 
 Subtyping constraints $\forall\alpha. \ \alpha \leq \{\text{\snip{f}}_1: \beta_1, \ .. \ , \text{\snip{f}}_n : \beta_n\} \Rightarrow \tau$ are translated to constraints $\forall\alpha. (\text{\snip{f}}_1 : \alpha \rightarrow \beta_1, \ .. \ , \text{\snip{f}}_n : \alpha \rightarrow \beta_n) \Rightarrow \tau$. 
 
-The original paper gave a vivid example. A slightly modified version can be found in Fig.~\ref{translate}. 
+The original paper gave a vivid example. A slightly modified version can be found in Fig.~\ref{translate}. For convenience we give explicit type annotation for let bindings.
 \section{Extending System O}
 We extend System O by recursive instances and give big step semantics. 
-The system is designed to be easily transformed to debruijn representation. For convenience we give explicit type annotation for let bindings.
+The system is designed to be easily transformed to debruijn representation. 
 \subsection{Syntax}
 \begin{figure}
   \begin{align*}
