@@ -17,8 +17,8 @@
 
 \begin{document}
 \title{Elaboration on Overloading}
-\author{Marius Weidner \\ \email{weidner@cs.uni-freiburg.de}}
-\institute{Chair of Programming Languages, University of Freiburg}
+\author{Marius Weidner}
+\institute{\email{weidner@cs.uni-freiburg.de}\\ Chair of Programming Languages, University of Freiburg}
 \maketitle
 
 \begin{abstract}
@@ -29,13 +29,13 @@ We also derive an alternative system with support for recursive instances, strai
 \end{abstract}
 
 \section{Introduction}
-We use the term overloading to refer to overloaded \emph{identifiers}.
+We explore overloading in the form of overloaded \emph{identifiers}.
 We overload the meaning of an identifier $o$ with multiple valid interpretations in the form of \emph{functions}. 
 Each interpretation is called an \emph{instance}.
-Each instance gives one specific meaning to the identifier. 
-Each instance is unique in the type of the first argument $T$. 
+Each instance gives one specific meaning to the identifier and is unique in the type of the first argument $T$. 
 We say identifier $o$ is defined on $T$, if there exists an instance where $T$ is the type of the first argument of that function.
 Hence, if an identifier is invoked as a function we can decide the instance invoked based on the type of the first value applied to the identifier. 
+
 In combination with polymorphism we can go one step further by permitting quantified type variables to be restricted. 
 A type variable can be restricted to be only substitutable by a type $T$ for which instances $o_1, \ .., \ o_n$ are defined on $T$.
 Real world programming languages support overloading in a variety of ways, but they can usually be reduced to a more minimal system with only overloaded function identifiers. 
@@ -47,7 +47,7 @@ inst eq :: Nat -> Nat -> Bool
   eq zero    zero    = true
   eq (suc x) (suc y) = eq x y
   eq _       _       = false in
-inst eq :: (eq :: $\alpha$ -> $\alpha$ -> Bool) => [$\alpha$] -> [$\alpha$] -> Bool
+inst eq :: $\forall \alpha$. (eq :: $\alpha$ -> $\alpha$ -> Bool) => [$\alpha$] -> [$\alpha$] -> Bool
   eq nil         nil         = true
   eq (cons x xs) (cons y ys) = eq x y && eq xs ys
   eq _           _           = false in
@@ -56,25 +56,24 @@ let is_eq = eq [0] [0] in unit
   \caption{Overloading example} \label{example}
   \end{figure}
 \noindent 
-In Fig.~\ref{example} we define two instances for overloaded identifier \snip{eq}. 
+In Fig.~\ref{example} we define two instances for the overloaded identifier \snip{eq}. 
 Using the \emph{explicit} type annotation, we can reason that the first instance takes two \snip{Nat} and performs pattern matching to determine if the are equal. 
 The second instance is for lists with elements of type \snip{$\alpha$}. 
 However, \snip{$\alpha$} is constrained to only be substituted by types $T$ for which \snip{eq} is defined on $T$.
-More precisely, the constraint \snip{(eq \ :: \ a -> a -> Bool) => ..} expresses that we need to have an instance at hand for the type $T$, that is substituted for the type variable \snip{$\alpha$}, when using the second instance of \snip{eq}. 
 Inside the second instance we can safely call \snip{eq} on elements of the list, because of the constraint, and on sub-lists, given the language supports recursive instances. 
-While \snip{eq [zero] [zero]} would type check, \snip{eq [true] [true]} would fail to type check, because the constraint is not satisfied.
+While \snip{eq [0] [0]} type checks, \snip{eq [true] [true]} would fail to type check, because the constraint is not satisfied.
 
 \subsection{Overloading in Popular Languages}
 We briefly explore three examples of overloading in popular programming languages. 
-Despite the fact that all the examples are high level language constructs, we could theoretically translate them to some minimal language similar to the one in in Fig.~\ref{example}. 
+Despite the fact that all the examples are high level language constructs, we could theoretically translate them to a minimal language similar to the one in in Fig.~\ref{example}. 
 \paragraph{Python} uses magic methods to support overloading of operators and standard library functions. 
 A class can override the behavior for any of the predefined magic methods.
 Commonly used magic methods are for example \snip{\_\_init\_\_(self)} to provide logic when an object is initialized and \snip{\_\_eq\_\_(self, other)} to give custom equality logic for objects when using the \snip{==} operator. 
 In Python it is not possible to define custom magic methods or any other form of custom overloading.
 \paragraph{Haskell} makes use of type classes. 
 Type classes define abstract polymorphic functions. 
-Therefore we can instantiate a type class for a specific type by concretely defining the behavior for all functions defined by the type class concretely. 
-A function can have type class constraints to force substituted types for type variables to be a member of some instances. 
+We can instantiate a type class for a specific type by concretely defining the behavior for all functions defined by the type class. 
+A function can have type class constraints to force substituted types for type variables to be a member of an instances. 
 \paragraph{Rust} has a language feature called traits. Similar to Haskell's type classes, a trait defines abstract function definitions. 
 Traits are implemented for types. This reminds of Python's magic methods, since they are defined on classes.
 Type variables can be annotated with a trait bound forcing a concrete type, when substituted for the type variable, to have implemented a specific trait. 
@@ -92,8 +91,8 @@ The explicit type annotation $\sigma_T$ must be a, possibly polymorphic, \emph{f
 
 Polymorphic types $\sigma_T$ can introduce type variables $\alpha$ using the $\forall$ quantifier. 
 On top of the original Hindley Milner quantifier $\forall \alpha. \ \sigma$, System O allows to introduce constraints $\pi_\alpha$ on $\alpha$. 
-The list of constraints $\pi_\alpha$ contains constraints in the form of $o : \alpha \rightarrow \tau$, where $o$ is some overloaded identifier and $\tau$ is a monomorphic type.
-We write $\forall \alpha. \ (o_1 : \alpha \rightarrow \tau_1, o_n : \alpha \rightarrow \tau_n) \Rightarrow \sigma$, to denote polymorphic types with constraints and $\forall \alpha. \ \sigma$, if there are no constraints on $\alpha$. 
+The list of constraints $\pi_\alpha$ contains zero or more constraints in the form of $o : \alpha \rightarrow \tau$, where $o$ is an overloaded identifier and $\tau$ is a monomorphic type.
+We write $\forall \alpha. \ (o_1 : \alpha \rightarrow \tau_1, \ .. \ , o_n : \alpha \rightarrow \tau_n) \Rightarrow \sigma$, to denote polymorphic types with constraints and $\forall \alpha. \ \sigma$, if there are no constraints on $\alpha$. 
 
 \subsection{Type System}
 System O's type system a simple an extension of Hindley Milner's typing rules~\cite{dm82}. 
@@ -109,19 +108,23 @@ The rule says that constraints $\pi_\alpha$ are valid, if each single constraint
 Finally, there is an additional rule (INST) for instance declarations. 
 Since \snip{inst} declaration are similar to \snip{let} statements their typing is also similar. 
 Other than with \snip{let}, we have an explicit type annotation $\sigma_T$ at hand. 
-We also require all other instances with the same name $o$, defined before in $\Gamma$ with type annotations $\sigma_{T^\prime}$, to differ in the type of the first argument $T^\prime$. 
-This requirement is necessary to \emph{deterministically} find the correct instance when an overloaded identifier is invoked.
+First we require $\sigma_T$ to be compatible with the instance body.
+Secondly, we require all other instances with the same name $o$, defined before in $\Gamma$ with type annotations $\sigma_{T^\prime}$, to differ in the type of the first argument $T^\prime$. 
+This requirement is necessary to \emph{deterministically} find the correct instance, when an overloaded identifier is invoked.
 
 \subsection{Semantics}
 Since all instances differ in the type of their first argument, it is straight forward to formulate \emph{untyped} semantics.
-When an overloaded identifier is invoked $o \ v_1 \ .. \ v_n$, we can determine the type of the first argument $T$ uniquely by the value $v_1$. 
-The authors give denotational semantics. Denotational semantics use a meaning function $\llbracket \cdot \rrbracket_\eta$ that gives a term or type $\cdot$ a mathematical meaning in environment $\eta$.
+When an overloaded identifier is invoked $o \ v_1 \ .. \ v_n$, we can determine the type of the first argument $T$ uniquely by the value $v_1$.
+We then choose the instance $o$ defined on $T$. 
+The authors give denotational semantics.
+Denotational semantics use a meaning function $\llbracket \cdot \rrbracket_\eta$ that gives a term or type $\cdot$ a mathematical meaning in environment $\eta$.
 In section \ref{semantics} we give operational semantics for a slightly modified System O. 
 
 \subsection{Type Inference Algorithm}
 The authors extended Hindley Milner's Algorithm W~\cite{hm78}. We only discuss changes to the original Algorithm W.
 
-The algorithm is extended by a case for \snip{inst} declarations. The \emph{inferred} type $\sigma_T^\prime$ of the body $e$ must be \emph{less} general than the type annotation $\sigma_T$. 
+The algorithm is extended by a case for \snip{inst} declarations. 
+The \emph{inferred} type $\sigma_T^\prime$ of the body $e$ must be \emph{less} general than the type annotation $\sigma_T$. 
 Formally, a type $\forall \beta_1 \ .. \ \beta_n. \ \tau^\prime$ is less general than $\forall \alpha_1 \ .. \ \alpha_n. \ \tau$, if there exists a substitution $\{\alpha_i \mapsto \tau_i\}$, such that $\{\alpha_i \mapsto \tau_i\}\tau = \tau^\prime$.  
 For example, \snip{Nat} $\rightarrow$ \snip{Nat} is less general than $\forall \alpha. \ \alpha \rightarrow \alpha$ for substitution $\{\alpha \mapsto \text{Nat}\}$. This extension corresponds to the (INST) rule.
 
@@ -153,13 +156,13 @@ We use type information to replace later invocations on that specific instance w
 
 Since constraints $\pi_\alpha$ can only appear in the explicit type of instances, they are transformed to \emph{arguments} of the translated instance.
 For each constraint $o : \alpha \rightarrow \tau$ we add a new argument of type $\alpha \rightarrow \tau$. 
-When invoking the unique name of the translated instance we pass the correct instances originally required by the constraints as arguments. 
+When invoking the unique name of the translated instance we pass the correct instances, originally required by the constraints, as arguments. 
 Using the type information this is straight forward. 
 While translating constraints to higher order functions it can happen that a type scheme is part of an function type. 
-Since constraints $\pi_\alpha$ only use mono types $\tau$ and type variable $\alpha$ it is safe to define that $\tau \rightarrow \forall \alpha. \ \sigma \equiv \forall \alpha. \ \tau \rightarrow \sigma$ inside that process.
-Applying the equivalence rule until it cannot be used anymore, results results in typeable Hindley Milner programs.
+Since constraints $\pi_\alpha$ only use mono types $\tau$ and type variable $\alpha$, we can define that $\tau \rightarrow \forall \alpha. \ \sigma \equiv \forall \alpha. \ \tau \rightarrow \sigma$ inside that process.
+Applying the equivalence rule until it cannot be used anymore, results in typeable Hindley Milner programs.
 
-An example translation can be found in Fig.~\ref{transform}.
+An example translation can be found in Fig.~\ref{transform}. For convenience type annotations for let bindings are given.
 
 \subsection{Relationship with Record Typing}
 \begin{figure}
@@ -187,10 +190,10 @@ The translation introduces data types $R_i \ \alpha_1 \ .. \ \alpha_n$ for each 
 
 Subtyping constraints $\forall\alpha. \ \alpha \leq \{\text{\snip{f}}_1: \beta_1, \ .. \ , \text{\snip{f}}_n : \beta_n\} \Rightarrow \tau$ are translated to constraints $\forall\alpha. (\text{\snip{f}}_1 : \alpha \rightarrow \beta_1, \ .. \ , \text{\snip{f}}_n : \alpha \rightarrow \beta_n) \Rightarrow \tau$. 
 
-The original paper gave a vivid example. A slightly modified version can be found in Fig.~\ref{translate}.
+The original paper gave a vivid example. A slightly modified version can be found in Fig.~\ref{translate}. 
 \section{Extending System O}
 We extend System O by recursive instances and give big step semantics. 
-The system is designed to straight forwardly use debruijn representation.
+The system is designed to be easily transformed to debruijn representation. For convenience we give explicit type annotation for let bindings.
 \subsection{Syntax}
 \begin{figure}
   \begin{align*}
@@ -227,7 +230,7 @@ Typing context $\Gamma$ can hold one or more types per identifier.
 Normal identifiers $x$ have exactly one type $\sigma$ while overloaded identifiers have a list of types $\Sigma$ with length equal to the amount of instance definitions. 
 We write $\Gamma(o) \uplus \sigma_T$ to append a type $\sigma_T$ to the list of types $\Sigma$ of identifier $o$.
 
-A value $v$ can be a closure $\lambda (\mathcal{E}; \ x). \ e$, constructor $k$ applied to values $v_1$ to $v_n$ or a list $\mathcal{S}$ of type annotated expressions $(e, T)$. The latter occurs when an overloaded identifier is treated as value. 
+A value $v$ can be an environment capturing closure $\lambda (\mathcal{E}; \ x). \ e$, constructor $k$ applied to values $v_1$ to $v_n$ or a list $\mathcal{S}$ of type annotated expressions $(e, T)$. The latter occurs when an overloaded identifier is treated as value. 
 
 The evaluation context $\mathcal{E}$ is analogous to the typing context $\Gamma$. 
 $\mathcal{E}$ can hold exactly one value for normal identifiers $x$ and multiple typed expressions for overloaded identifiers $o$. 
@@ -420,9 +423,15 @@ We extended System O by recursive instance declarations and gave operational sem
 
 \begin{thebibliography}{8}
 
-\bibitem{oww95}Odersky, M., Wadler, P. \& Wehr, M. A Second Look at Overloading. {\em Proceedings Of The Seventh International Conference On Functional Programming Languages And Computer Architecture}. pp. 135-146 (1995), https://doi.org/10.1145/224164.224195
-\bibitem{hm78}Milner, R. A theory of type polymorphism in programming. {\em Journal Of Computer And System Sciences}. \textbf{17}, 348-375 (1978), https://www.sciencedirect.com/science/article/pii/0022000078900144
-\bibitem{dm82}Damas, L. \& Milner, R. Principal Type-Schemes for Functional Programs. {\em Proceedings Of The 9th ACM SIGPLAN-SIGACT Symposium On Principles Of Programming Languages}. pp. 207-212 (1982), https://doi.org/10.1145/582153.582176
+\bibitem{oww95}Odersky, M., Wadler, P. \& Wehr, M. A Second Look at Overloading. 
+{\em Proceedings Of The Seventh International Conference On Functional Programming Languages And Computer Architecture}. 
+pp. 135-146 (1995), https://doi.org/10.1145/224164.224195
+\bibitem{hm78}Milner, R. A theory of type polymorphism in programming. 
+{\em Journal Of Computer And System Sciences}. 
+\textbf{17}, 348-375 (1978), https://www.sciencedirect.com/science/article/pii/0022000078900144
+\bibitem{dm82}Damas, L. \& Milner, R. Principal Type-Schemes for Functional Programs. 
+{\em Proceedings Of The 9th ACM SIGPLAN-SIGACT Symposium On Principles Of Programming Languages}. 
+pp. 207-212 (1982), https://doi.org/10.1145/582153.582176
 
 \end{thebibliography}
 \end{document}
