@@ -25,7 +25,7 @@
 Most real world programming languages support overloading. 
 Prominent use cases include overloading of arithmetic operators for different types or showing a arbitrary value as a string. 
 We study a minimal extension of the Hindley Milner system that supports overloading, while preserving full type inference. 
-We also derive an alternative system with support for recursive instances, straight forward debruijn indices and give big step semantics.
+We also derive a slightly modified system with support for recursive instances, straight forward debruijn indices and big step semantics.
 \end{abstract}
 
 \section{Introduction}
@@ -185,9 +185,9 @@ More surprisingly this extended language can be translated \emph{back} to System
 
 The record extension introduces record types $\{l_i : \tau_i\}_{i \in \mathbb{N}}$, record expressions $\{f_i = e_i \}_{i \in \mathbb{N}}$, selectors $e.f$ selecting field $f$ on record $e$ and subtyping constraints $a \leq b$ where $a$ must have at least all the fields $l_i : \tau_i$ that $b$ has.
 
-The translation introduces data types $R_i \ \alpha_1 \ .. \ \alpha_n$ for each unique record $r_i = \{f_1 : \alpha_1, \ .. \, f_n : \alpha_n\}$ given in the original program. For each field $f_i$ an instance \snip{inst f$_i$ : $\forall \alpha_1 \ .. \ \alpha_n$. R$_i$ $\alpha_1 \ .. \ \alpha_n$ -> $\alpha_i$ = $\lambda$R$_i$ x$_1$ .. x$_n$. x$_i$ in ..} is declared. All selector expressions \snip{e.f} are translated to instance invocations \snip{f e}.
+The translation introduces data types $R_i \ \alpha_1 \ .. \ \alpha_n$ for each unique record $r_i = \{f_1 : \alpha_1, \ .. , \ f_n : \alpha_n\}$ given in the original program. For each field $f_i$ an instance \snip{inst f$_i$ : $\forall \alpha_1 \ .. \ \alpha_n$. R$_i$ $\alpha_1 \ .. \ \alpha_n$ -> $\alpha_i$ = $\lambda$R$_i$ x$_1$ .. x$_n$. x$_i$ in ..} is declared. All selector expressions \snip{e.f} are translated to instance invocations \snip{f e}.
 
-Subtyping constraints $\forall\alpha. \ \alpha \leq \{\text{\snip{f}}_1: \beta_1, \ .. \ , \text{\snip{f}}_n : \beta_n\} \Rightarrow \tau$ are translated to constraints $\forall\alpha. (\text{\snip{f}}_1 : \alpha \rightarrow \beta_1, \ .. \ , \text{\snip{f}}_n : \alpha \rightarrow \beta_n) \Rightarrow \tau$. 
+Subtyping constraints $\forall\alpha. \ \alpha \leq \{\text{\snip{f}}_1: \beta_1, \ .. , \ \text{\snip{f}}_n : \beta_n\} \Rightarrow \tau$ are translated to constraints $\forall\alpha. (\text{\snip{f}}_1 : \alpha \rightarrow \beta_1, \ ..  , \ \text{\snip{f}}_n : \alpha \rightarrow \beta_n) \Rightarrow \tau$. 
 
 The original paper gave a vivid example. A slightly modified version can be found in Fig.~\ref{translate}. For convenience we give explicit type annotation for let bindings.
 \section{Extending System O}
