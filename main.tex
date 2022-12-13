@@ -306,12 +306,12 @@ We write $\mathcal{E}(o) \uplus (e, \sigma_T)$ to append a type $(e, \sigma_T)$ 
 \end{figure}
 \noindent Typing rules are given in Fig.~\ref{typing}. Again, we only discuss changes to the original type system. 
 
-Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it occurs in the list of function types $\Sigma$ that the variable is overloaded with. 
+Rule (T-OVar) says that an overloaded identifier $o$ has type $\sigma_T$ if it occurs in the list of function types $\Sigma$, that the variable is overloaded with. 
 
 Rule (T-Decl) introduces an new overloaded variable $o$ to $p$ by appending $\Gamma$ in $p$ with the empty list, for future instance declarations to append their explicit type.
 
 Finally, (T-Inst) checks that for every $\sigma_T^\prime$ in $\Sigma$ of $o$ the constructor of the first argument $T$ is unique. 
-To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$ when checking the body $e$. 
+To support recursive instances we append the type annotation of the instance $\sigma_T$ to $\Gamma$, when checking the body $e$. 
 \subsection{Big Step Semantics}
 \label{semantics}
 \begin{figure}$$
@@ -418,7 +418,6 @@ We have studied System O, a minimal system that is foundation of many popular pr
 Because of the close relation to Hindley Milner's system, full type inference is preserved by a simple extension of Algorithm W. 
 We extended System O with recursive instance declarations and gave operational semantics.
 
-\newpage 
 
 \begin{thebibliography}{8}
 
